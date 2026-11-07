@@ -1,0 +1,27 @@
+sequenceDiagram
+  autonumber
+  actor R as Repartidor
+  participant API as POST /guias/{n}/entrega
+  participant S as EntregaApplicationService
+  participant UoW as UnitOfWork
+  participant A as AlmacenEvidencias
+  participant G as Guia
+  participant SP as ExpressFueraDeTiempo
+  participant P as PublicadorEventos
+  R->>API: firma, foto, nombre receptor, es_tercero
+  API->>S: capturar_evidencia_entrega(cmd)
+  S->>S: EvidenciaEntrega(firma, foto, receptor)
+  alt falta firma, foto o nombre (RN-07, RN-11)
+    S-->>API: EvidenciaIncompleta
+    API-->>R: 422 "Falta la firma, la foto o el nombre de quien recibe"
+  else evidencia completa
+    S->>UoW: guias.por_numero(n)
+    S->>A: guardar(n, firma, foto)
+    S->>G: registrar_entrega(evidencia, ubicacion, ahora)
+    G->>G: _transicionar(ENTREGADO) + EventoRastreo (RN-04, RN-05)
+    G->>SP: ¿Express entregado > 48 h? (RN-19)
+    SP-->>G: sí → reembolso 50 %
+    S->>UoW: guardar + commit
+    S->>P: publicar([EntregaCompletada])
+    API-->>R: 200 estado ENTREGADO, reembolso
+  end

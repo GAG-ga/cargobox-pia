@@ -1,0 +1,122 @@
+classDiagram
+  direction TB
+  namespace application {
+    class EnvioApplicationService {
+      +registrar_guia(RegistrarGuiaCommand) GuiaRegistradaDTO
+      +cancelar(numero)
+      +corregir_destino(numero, direccion)
+      +cambiar_direccion(CambiarDireccionCommand)
+    }
+    class RastreoApplicationService {
+      +registrar_escaneo(RegistrarEscaneoCommand)
+    }
+    class EntregaApplicationService {
+      +registrar_intento_fallido(numero, motivo)
+      +capturar_evidencia_entrega(CapturarEvidenciaCommand)
+      +reagendar(numero)
+    }
+    class IncidenciaApplicationService {
+      +monitorear_retrasos(ahora)
+      +escalar_alertas(ahora)
+      +vencer_resguardos(ahora)
+      +abrir_folio_dano(numero, foto)
+      +resolver(folio, resolucion)
+      +declarar_perdida(numero)
+    }
+    class ConsultaRastreoQueryService {
+      +estado_publico(numero) EstadoPublicoView
+      +historial(numero, telefono) HistorialEnvioView
+    }
+    class UnitOfWork {
+      <<interface>>
+      guias: GuiaRepository
+      incidencias: IncidenciaRepository
+      commit()
+      rollback()
+    }
+    class AlmacenEvidencias {
+      <<interface>>
+      guardar(numero, firma, foto) str
+    }
+    class PublicadorEventos {
+      <<interface>>
+      publicar(eventos)
+    }
+  }
+  namespace domain {
+    class Guia {
+      <<AggregateRoot>>
+      numero: NumeroGuia
+      estado: EstadoGuia
+      eventos: list~EventoRastreo~
+      intentos: list~IntentoEntrega~
+      evidencia: EvidenciaEntrega
+      +generar()$
+      +registrar_escaneo()
+      +registrar_intento_fallido()
+      +registrar_entrega()
+      +cancelar()
+      +cambiar_direccion()
+      +reagendar()
+      +devolver()
+      +declarar_perdida()
+      -_transicionar()
+    }
+    class Incidencia {
+      <<AggregateRoot>>
+      folio
+      tipo
+      estado
+      +escalar()
+      +resolver()
+    }
+    class MaquinaEstadosGuia {
+      <<StateMachine>>
+      TRANSICIONES
+      +validar(origen, destino)
+      +es_final(estado)
+    }
+    class Specification {
+      <<abstract>>
+      +es_satisfecha_por(c) bool
+      +__and__() +__or__() +__invert__()
+    }
+    class PuedeCancelarse
+    class RequiereAlertaPorRetraso
+    class PuedeDeclararsePerdida
+    class Cotizador {
+      <<DomainService>>
+      +cotizar() Dinero
+    }
+    class PoliticaTarifa {
+      <<interface>>
+      +factor() Decimal
+    }
+    class GuiaRepository {
+      <<interface>>
+      +por_numero(n) Guia
+      +guardar(g)
+      +siguiente_numero() NumeroGuia
+    }
+  }
+  namespace infrastructure {
+    class SqlAlchemyUnitOfWork
+    class SqlGuiaRepository
+    class AlmacenEvidenciasDisco
+  }
+  EnvioApplicationService ..> UnitOfWork
+  EnvioApplicationService ..> Cotizador
+  EntregaApplicationService ..> AlmacenEvidencias
+  IncidenciaApplicationService ..> Specification
+  EnvioApplicationService ..> PublicadorEventos
+  UnitOfWork --> GuiaRepository
+  Guia --> MaquinaEstadosGuia : delega transiciones
+  Guia ..> Specification : protege métodos
+  Specification <|-- PuedeCancelarse
+  Specification <|-- RequiereAlertaPorRetraso
+  Specification <|-- PuedeDeclararsePerdida
+  Cotizador --> PoliticaTarifa
+  SqlAlchemyUnitOfWork ..|> UnitOfWork
+  SqlGuiaRepository ..|> GuiaRepository
+  AlmacenEvidenciasDisco ..|> AlmacenEvidencias
+  Incidencia ..> Guia : numero_guia

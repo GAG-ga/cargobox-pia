@@ -1,0 +1,51 @@
+# CargoBox — entorno reproducible: DB + App + Tests (ADR-010)
+#   docker compose up --build                 → base de datos + API en http://localhost:8000/docs
+#   docker compose run --rm tests             → pruebas con cobertura contra PostgreSQL
+#   docker compose down -v                    → apagar y borrar datos
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cargobox}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cargobox}
+      POSTGRES_DB: ${POSTGRES_DB:-cargobox}
+    volumes:
+      - datos_db:/var/lib/postgresql/data
+      - ./docker/01-crear-base-pruebas.sql:/docker-entrypoint-initdb.d/01-crear-base-pruebas.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cargobox}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-cargobox}:${POSTGRES_PASSWORD:-cargobox}@db:5432/${POSTGRES_DB:-cargobox}
+      APP_ENV: ${APP_ENV:-local}
+      EVIDENCIAS_DIR: /data/evidencias
+    volumes:
+      - evidencias:/data/evidencias
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  tests:
+    build: .
+    profiles: ["tests"]
+    environment:
+      TEST_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-cargobox}:${POSTGRES_PASSWORD:-cargobox}@db:5432/cargobox_test
+    command: >
+      sh -c "ruff check src tests &&
+             pytest -v --cov=src --cov-report=term-missing --cov-fail-under=80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  datos_db:
+  evidencias:

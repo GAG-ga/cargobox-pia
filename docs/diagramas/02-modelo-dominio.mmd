@@ -1,0 +1,99 @@
+classDiagram
+  direction LR
+  class Guia {
+    <<Aggregate Root>>
+    numero: NumeroGuia
+    estado: EstadoGuia
+    nivel: NivelServicio
+    tarifa: Dinero
+    valor_declarado: Dinero
+    fecha_estimada
+    con_garantia: bool
+    reagendada: bool
+    generar()
+    registrar_escaneo()
+    registrar_intento_fallido()
+    registrar_entrega()
+    cancelar()
+    corregir_destino()
+    cambiar_direccion()
+    reagendar()
+    devolver()
+    declarar_perdida()
+  }
+  class EventoRastreo {
+    <<Entity>>
+    estado
+    ubicacion
+    fecha_hora
+  }
+  class IntentoEntrega {
+    <<Entity>>
+    numero
+    exitoso
+    motivo
+  }
+  class EvidenciaEntrega {
+    <<Value Object>>
+    firma_digital
+    foto
+    nombre_receptor
+    es_tercero
+  }
+  class Persona {
+    <<Value Object>>
+    nombre
+    telefono
+  }
+  class Direccion {
+    <<Value Object>>
+    calle
+    codigo_postal
+  }
+  class Peso {
+    <<Value Object>>
+    kg ≤ 30
+  }
+  class Dimensiones {
+    <<Value Object>>
+    largo, ancho, alto ≤ 100
+    peso_volumetrico()
+  }
+  class NivelServicio {
+    <<enumeration>>
+    ESTANDAR
+    EXPRESS
+  }
+  class EstadoGuia {
+    <<enumeration>>
+    RECIBIDO … ENTREGADO
+    EN_RESGUARDO
+    DEVUELTO
+    CANCELADO
+    PERDIDO
+  }
+  class Cotizador {
+    <<Domain Service>>
+    cotizar(peso, dims, origen, destino, nivel)
+  }
+  class Incidencia {
+    <<Aggregate Root>>
+    folio
+    tipo: DANO | RETRASO
+    estado: ABIERTA | ESCALADA | RESUELTA
+    asignada_a
+    resolucion
+    escalar()
+    resolver()
+  }
+  Guia "1" *-- "1..*" EventoRastreo : registra
+  Guia "1" *-- "0..3" IntentoEntrega : tiene
+  Guia "1" *-- "0..1" EvidenciaEntrega : certifica
+  Guia --> "2" Persona : remitente / destinatario
+  Guia --> Direccion : origen / destino
+  Guia --> Peso
+  Guia --> Dimensiones
+  Guia --> NivelServicio
+  Guia --> EstadoGuia
+  Cotizador ..> Guia : calcula tarifa
+  Incidencia --> Guia : numero_guia

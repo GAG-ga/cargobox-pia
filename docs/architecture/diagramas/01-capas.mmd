@@ -1,0 +1,48 @@
+flowchart TB
+  classDef api fill:#dbe9f7,stroke:#1f4e79,color:#000
+  classDef app fill:#ede7f6,stroke:#4527a0,color:#000
+  classDef dom fill:#fff3cd,stroke:#8a6d00,color:#000
+  classDef inf fill:#d9f2d9,stroke:#2e7d32,color:#000
+  classDef ext fill:#eeeeee,stroke:#555,color:#000
+
+  U["Clientes<br/>Swagger UI · sucursal · web de rastreo · cron"]:::ext
+  subgraph API["api/ — FastAPI"]
+    R1["rutas/guias.py<br/>US01–US07, US10, US11"]:::api
+    R2["rutas/consultas.py<br/>US08, US09"]:::api
+    R3["rutas/incidencias.py<br/>US12–US15"]:::api
+    E["errores.py<br/>error de dominio → mensaje"]:::api
+    DI["dependencias.py<br/>ensamblado (DI)"]:::api
+  end
+  subgraph APP["application/"]
+    S1[EnvioApplicationService]:::app
+    S2[RastreoApplicationService]:::app
+    S3[EntregaApplicationService]:::app
+    S4[IncidenciaApplicationService]:::app
+    Q[ConsultaRastreoQueryService]:::app
+    P["puertos.py<br/>UnitOfWork · PublicadorEventos<br/>AlmacenEvidencias · Reloj · HistorialRastreoReader"]:::app
+  end
+  subgraph DOM["domain/"]
+    G["Guia · Incidencia<br/>(agregados)"]:::dom
+    VO["Value Objects<br/>NumeroGuia · Peso · Dimensiones · Dinero…"]:::dom
+    SM[MaquinaEstadosGuia]:::dom
+    SP["Specifications"]:::dom
+    CO["Cotizador + PoliticaTarifa"]:::dom
+    IR["GuiaRepository · IncidenciaRepository<br/>(interfaces)"]:::dom
+  end
+  subgraph INF["infrastructure/"]
+    ORM["modelos.py · repositorios_sql.py<br/>SqlAlchemyUnitOfWork"]:::inf
+    AL[AlmacenEvidenciasDisco]:::inf
+    PB[PublicadorEnMemoria]:::inf
+    CF["config.py<br/>variables de entorno"]:::inf
+  end
+  DB[("PostgreSQL")]:::ext
+
+  U --> API
+  API --> APP
+  APP --> DOM
+  ORM -. implementa .-> IR
+  ORM -. implementa .-> P
+  AL -. implementa .-> P
+  PB -. implementa .-> P
+  ORM --> DB
+  DI --> INF

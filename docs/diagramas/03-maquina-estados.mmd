@@ -1,0 +1,19 @@
+stateDiagram-v2
+  [*] --> RECIBIDO: generar (US01)
+  RECIBIDO --> CLASIFICADO: escaneo ingreso (US04)
+  RECIBIDO --> CANCELADO: cancelar (US02)
+  CLASIFICADO --> EN_TRANSITO: escaneo salida (US04)
+  EN_TRANSITO --> CENTRO_DESTINO: escaneo destino (US04)
+  CENTRO_DESTINO --> EN_REPARTO: salida a ruta (US04)
+  EN_REPARTO --> ENTREGADO: firma + foto (US06/US07)
+  EN_REPARTO --> EN_RESGUARDO: 2º intento fallido (US05)
+  EN_RESGUARDO --> EN_REPARTO: reagendar 1 vez (US10)
+  EN_RESGUARDO --> ENTREGADO: recoger en centro (US10)
+  EN_RESGUARDO --> DEVUELTO: vencen 5 días hábiles (US10)
+  EN_TRANSITO --> PERDIDO: > 10 días sin rastreo (US15)
+  CENTRO_DESTINO --> PERDIDO: > 10 días sin rastreo (US15)
+  EN_REPARTO --> PERDIDO: > 10 días sin rastreo (US15)
+  ENTREGADO --> [*]
+  CANCELADO --> [*]
+  DEVUELTO --> [*]
+  PERDIDO --> [*]

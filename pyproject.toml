@@ -1,0 +1,30 @@
+[project]
+name = "cargobox"
+version = "1.0.0"
+description = "CargoBox — Plataforma de envíos nacionales (PIA Componentes de Lógica de Negocios)"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["integracion: pruebas que usan base de datos o HTTP"]
+filterwarnings = ["ignore::DeprecationWarning:fastapi.testclient", "ignore:Using `httpx`"]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.flake8-bugbear]
+# Depends(...) y Query(...) en los parámetros es el patrón oficial de FastAPI
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]

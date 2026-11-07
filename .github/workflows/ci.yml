@@ -1,0 +1,52 @@
+name: CI CargoBox
+on:
+  push:
+  pull_request:
+
+jobs:
+  calidad:
+    name: Lint + pruebas (SQLite y PostgreSQL) + cobertura
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cargobox
+          POSTGRES_PASSWORD: cargobox
+          POSTGRES_DB: cargobox_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U cargobox" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+      - name: Lint (Ruff)
+        run: ruff check src tests
+      - name: Pruebas unitarias y de aceptación (SQLite en memoria)
+        run: pytest -q
+      - name: Pruebas de integración contra PostgreSQL + cobertura ≥ 80 %
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg://cargobox:cargobox@localhost:5432/cargobox_test
+        run: pytest -v --cov=src --cov-report=term-missing --cov-report=xml --cov-fail-under=80
+      - name: Verificar especificación OpenAPI
+        run: python scripts/exportar_openapi.py --verificar
+
+  imagen:
+    name: Build de la imagen Docker
+    needs: calidad
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir imagen
+        run: docker build -t cargobox:${{ github.sha }} .
+      - name: Probar que la API arranca
+        run: |
+          docker run -d --name api -p 8000:8000 cargobox:${{ github.sha }}
+          for i in $(seq 1 20); do curl -fs http://localhost:8000/salud && exit 0; sleep 1; done
+          docker logs api; exit 1

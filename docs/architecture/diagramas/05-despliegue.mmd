@@ -1,0 +1,17 @@
+flowchart LR
+  classDef box fill:#dbe9f7,stroke:#1f4e79,color:#000
+  classDef db fill:#d9f2d9,stroke:#2e7d32,color:#000
+  classDef ext fill:#eeeeee,stroke:#555,color:#000
+  subgraph DEV["Local: docker compose"]
+    app1["app<br/>uvicorn :8000"]:::box --> db1[("db<br/>postgres:16")]:::db
+    tests["tests<br/>pytest --cov"]:::box --> db1
+  end
+  subgraph GH["GitHub"]
+    repo["Repositorio"]:::ext --> ci["Actions<br/>ruff → pytest ≥80% → docker build"]:::box
+  end
+  subgraph RENDER["Render"]
+    web["Web Service<br/>FastAPI · /docs"]:::box --> pg[("PostgreSQL<br/>gestionado")]:::db
+    cron["Cron Job<br/>POST /monitoreo/ejecutar"]:::ext --> web
+  end
+  repo -- "push a main" --> web
+  user["Usuario / profesor"]:::ext -- HTTPS --> web

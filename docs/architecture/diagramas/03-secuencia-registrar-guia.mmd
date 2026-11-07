@@ -1,0 +1,28 @@
+sequenceDiagram
+  autonumber
+  actor E as Empleado de sucursal
+  participant API as POST /guias
+  participant S as EnvioApplicationService
+  participant UoW as UnitOfWork
+  participant C as Cotizador
+  participant G as Guia
+  participant SM as MaquinaEstadosGuia
+  participant P as PublicadorEventos
+  E->>API: peso, dimensiones, origen, destino, nivel, valor declarado
+  API->>S: registrar_guia(RegistrarGuiaCommand)
+  S->>UoW: abrir transacción
+  S->>C: cotizar(peso, dims, origen, destino, nivel)
+  alt peso > 30 kg o lado > 100 cm (RN-01)
+    C-->>S: CargaEspecialRequerida
+    S->>UoW: rollback
+    API-->>E: 422 "El paquete excede 30 kg o 100 cm: debe enviarse como carga especial"
+  else dentro de límites
+    C-->>S: tarifa (RN-03)
+    S->>UoW: guias.siguiente_numero() (RN-02)
+    S->>G: Guia.generar(numero, ..., tarifa, ahora)
+    G->>SM: validar(∅ → RECIBIDO)
+    G->>G: registrar EventoRastreo RECIBIDO (RN-05)
+    S->>UoW: guias.guardar(guia) + commit
+    S->>P: publicar([GuiaGenerada])
+    API-->>E: 201 numero, tarifa, fecha estimada (RN-20)
+  end

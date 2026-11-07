@@ -1,0 +1,47 @@
+flowchart TB
+  classDef evento fill:#d9f2d9,stroke:#2e7d32,color:#000
+  classDef fin fill:#f8d7da,stroke:#b71c1c,color:#000
+  classDef tarea fill:#dbe9f7,stroke:#1f4e79,color:#000
+  classDef gw fill:#fff3cd,stroke:#8a6d00,color:#000
+  classDef timer fill:#ede7f6,stroke:#4527a0,color:#000
+
+  subgraph L1["Remitente"]
+    I((Entrega paquete)):::evento
+  end
+  subgraph L2["Sucursal"]
+    A1[Pesar, medir y cotizar]:::tarea --> G1{"¿≤ 30 kg y<br/>≤ 100 cm?"}:::gw
+    G1 -- No --> F1([Fin: carga especial / rechazo]):::fin
+    G1 -- Sí --> A2[Cobrar, generar guía e imprimir<br/>RECIBIDO]:::tarea
+    A2 --> G2{"¿Cliente cancela<br/>antes de clasificar?"}:::gw
+    G2 -- Sí --> F2([Fin: CANCELADO]):::fin
+  end
+  subgraph L3["Centro de distribución"]
+    A3[Escaneo de ingreso y clasificación<br/>CLASIFICADO]:::tarea --> A4[Despacho a ruta<br/>EN_TRANSITO]:::tarea
+    A4 --> A5[Ingreso a centro destino<br/>CENTRO_DESTINO]:::tarea
+    R1[Resguardo en almacén<br/>EN_RESGUARDO · máx. 5 días hábiles]:::tarea
+    R1 --> G5{"¿Destinatario reagenda<br/>o recoge?"}:::gw
+    G5 -- Recoge en centro --> A9[Entregar en centro con firma + foto]:::tarea
+    G5 -- "Vencen 5 días hábiles" --> F4([Fin: DEVUELTO al remitente]):::fin
+  end
+  subgraph L4["Repartidor"]
+    A6[Cargar paquete y salir a ruta<br/>EN_REPARTO]:::tarea --> G3{"¿Destinatario o<br/>tercero presente?"}:::gw
+    G3 -- Sí --> A7[Capturar firma + foto<br/>y nombre de quien recibe]:::tarea
+    G3 -- No --> A8[Registrar intento fallido]:::tarea
+    A8 --> G4{"¿Es el<br/>2º intento?"}:::gw
+    G4 -- "No (1er intento)" --> A6
+  end
+  subgraph L5["Atención al Cliente / Supervisor"]
+    T1[/"Timer 24 h sin cambio"/]:::timer --> B1[Generar alerta por retraso]:::tarea
+    B1 --> T2[/"Timer 48 h sin resolver"/]:::timer --> B2[Escalar a supervisor]:::tarea
+    T3[/"Timer > 10 días sin rastreo"/]:::timer --> B3[Declarar pérdida y compensar<br/>PERDIDO]:::tarea --> F5([Fin: pérdida compensada]):::fin
+    C1[Cambio de dirección en tránsito<br/>+$80 · sin garantía]:::tarea
+  end
+
+  I --> A1
+  G2 -- No --> A3
+  A5 --> A6
+  A4 -.-> C1 -.-> A5
+  G4 -- "Sí" --> R1
+  G5 -- "Reagenda (1 vez)" --> A6
+  A7 --> F3([Fin: ENTREGADO]):::fin
+  A9 --> F3

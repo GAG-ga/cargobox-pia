@@ -1,0 +1,1648 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CargoBox API",
+    "description": "\nAPI de **CargoBox — Plataforma de Envíos Nacionales** (Caso 14, PIA Componentes de Lógica de Negocios).\n\nImplementa las 15 historias de usuario del BRD con DDD, Specification y State Machine.\nCada endpoint indica su historia (US) en el título. Los errores de negocio responden con\n`{\"error\": \"...\", \"mensaje\": \"...\"}` en lenguaje entendible para el cliente.\n",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/guias": {
+      "post": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US01 · Registrar un envío y generar su guía",
+        "operationId": "registrar_guia_guias_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrarGuiaIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guias/{numero}/cancelacion": {
+      "post": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US02 · Cancelar una guía antes de clasificarla",
+        "operationId": "cancelar_guias__numero__cancelacion_post",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guias/{numero}/datos": {
+      "patch": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US03 · Corregir origen o destino antes de clasificar",
+        "operationId": "corregir_datos_guias__numero__datos_patch",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorregirDatosIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guias/{numero}/escaneos": {
+      "post": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US04 · Registrar escaneo en centro de distribución",
+        "operationId": "registrar_escaneo_guias__numero__escaneos_post",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EscaneoIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guias/{numero}/intentos-fallidos": {
+      "post": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US05 · Registrar intento de entrega fallido",
+        "operationId": "registrar_intento_fallido_guias__numero__intentos_fallidos_post",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntentoFallidoIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guias/{numero}/entrega": {
+      "post": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US06 / US07 / US10 · Entregar con firma y foto (también a tercero o en centro)",
+        "operationId": "capturar_evidencia_guias__numero__entrega_post",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntregaIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guias/{numero}/reagendamiento": {
+      "post": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US10 · Reagendar la visita durante el resguardo",
+        "operationId": "reagendar_guias__numero__reagendamiento_post",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guias/{numero}/direccion": {
+      "patch": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US11 · Cambiar dirección en tránsito (+$80, sin garantía)",
+        "operationId": "cambiar_direccion_guias__numero__direccion_patch",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambioDireccionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/guias/{numero}/perdida": {
+      "post": {
+        "tags": [
+          "Guías"
+        ],
+        "summary": "US15 · Declarar pérdida y calcular compensación",
+        "operationId": "declarar_perdida_guias__numero__perdida_post",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuiaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La guía no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Una regla del negocio no lo permite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Datos inválidos o incompletos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rastreo/{numero}": {
+      "get": {
+        "tags": [
+          "Rastreo público"
+        ],
+        "summary": "US08 · Estado actual y fecha estimada para el destinatario",
+        "operationId": "estado_publico_rastreo__numero__get",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstadoPublicoOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rastreo/{numero}/historial": {
+      "get": {
+        "tags": [
+          "Rastreo público"
+        ],
+        "summary": "US09 · Historial completo para el remitente",
+        "operationId": "historial_rastreo__numero__historial_get",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          },
+          {
+            "name": "telefono",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Teléfono del remitente (RN-08)",
+              "title": "Telefono"
+            },
+            "description": "Teléfono del remitente (RN-08)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorialOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/incidencias": {
+      "get": {
+        "tags": [
+          "Incidencias y monitoreo"
+        ],
+        "summary": "US12 · US13 · Ver alertas e incidencias pendientes (abiertas y escaladas)",
+        "operationId": "listar_pendientes_incidencias_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/IncidenciaOut"
+                  },
+                  "type": "array",
+                  "title": "Response Listar Pendientes Incidencias Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/incidencias/danos": {
+      "post": {
+        "tags": [
+          "Incidencias y monitoreo"
+        ],
+        "summary": "US14 · Abrir folio por paquete dañado",
+        "operationId": "abrir_folio_dano_incidencias_danos_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FolioDanoIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidenciaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/incidencias/{folio}/resolucion": {
+      "post": {
+        "tags": [
+          "Incidencias y monitoreo"
+        ],
+        "summary": "US14 · Resolver incidencia (reembolso / reposición / atendida)",
+        "operationId": "resolver_incidencias__folio__resolucion_post",
+        "parameters": [
+          {
+            "name": "folio",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Folio"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolucionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidenciaOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        }
+      }
+    },
+    "/monitoreo/ejecutar": {
+      "post": {
+        "tags": [
+          "Incidencias y monitoreo"
+        ],
+        "summary": "US10 · US12 · US13 · Ejecutar reglas de tiempo (alertas, escalamiento, resguardos)",
+        "operationId": "ejecutar_monitoreo_monitoreo_ejecutar_post",
+        "parameters": [
+          {
+            "name": "ahora",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Fecha simulada para la demo (ISO 8601). Vacío = hora actual.",
+              "title": "Ahora"
+            },
+            "description": "Fecha simulada para la demo (ISO 8601). Vacío = hora actual."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoreoOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/salud": {
+      "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Verificar que la API está activa",
+        "operationId": "salud_salud_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CambioDireccionIn": {
+        "properties": {
+          "nueva_direccion": {
+            "$ref": "#/components/schemas/DireccionIn"
+          },
+          "identidad_validada": {
+            "type": "boolean",
+            "title": "Identidad Validada",
+            "description": "Atención al Cliente validó la identidad (RN-14)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nueva_direccion",
+          "identidad_validada"
+        ],
+        "title": "CambioDireccionIn"
+      },
+      "CorregirDatosIn": {
+        "properties": {
+          "origen": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DireccionIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "destino": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DireccionIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "CorregirDatosIn"
+      },
+      "DireccionIn": {
+        "properties": {
+          "calle": {
+            "type": "string",
+            "title": "Calle",
+            "examples": [
+              "Av. Universidad 100"
+            ]
+          },
+          "codigo_postal": {
+            "type": "string",
+            "title": "Codigo Postal",
+            "description": "5 dígitos",
+            "examples": [
+              "66450"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "calle",
+          "codigo_postal"
+        ],
+        "title": "DireccionIn"
+      },
+      "EntregaIn": {
+        "properties": {
+          "firma_digital": {
+            "type": "string",
+            "title": "Firma Digital",
+            "examples": [
+              "firma-ana.png"
+            ]
+          },
+          "foto": {
+            "type": "string",
+            "title": "Foto",
+            "examples": [
+              "foto-paquete.jpg"
+            ]
+          },
+          "nombre_receptor": {
+            "type": "string",
+            "title": "Nombre Receptor",
+            "examples": [
+              "Ana López"
+            ]
+          },
+          "es_tercero": {
+            "type": "boolean",
+            "title": "Es Tercero",
+            "description": "True si recibe un vecino o portero (US07)",
+            "default": false
+          },
+          "ubicacion": {
+            "type": "string",
+            "title": "Ubicacion",
+            "default": "Domicilio del destinatario"
+          }
+        },
+        "type": "object",
+        "required": [
+          "firma_digital",
+          "foto",
+          "nombre_receptor"
+        ],
+        "title": "EntregaIn"
+      },
+      "ErrorOut": {
+        "properties": {
+          "error": {
+            "type": "string",
+            "title": "Error",
+            "examples": [
+              "CargaEspecialRequerida"
+            ]
+          },
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje",
+            "examples": [
+              "El paquete excede 30 kg o 100 cm por lado: debe enviarse como carga especial y no puede recibir una guía estándar."
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "error",
+          "mensaje"
+        ],
+        "title": "ErrorOut"
+      },
+      "EscaneoIn": {
+        "properties": {
+          "nuevo_estado": {
+            "type": "string",
+            "enum": [
+              "CLASIFICADO",
+              "EN_TRANSITO",
+              "CENTRO_DESTINO",
+              "EN_REPARTO"
+            ],
+            "title": "Nuevo Estado"
+          },
+          "ubicacion": {
+            "type": "string",
+            "title": "Ubicacion",
+            "examples": [
+              "CEDIS Monterrey"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "nuevo_estado",
+          "ubicacion"
+        ],
+        "title": "EscaneoIn"
+      },
+      "EstadoPublicoOut": {
+        "properties": {
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "fecha_estimada": {
+            "type": "string",
+            "format": "date",
+            "title": "Fecha Estimada"
+          },
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "estado",
+          "fecha_estimada",
+          "mensaje"
+        ],
+        "title": "EstadoPublicoOut"
+      },
+      "EventoOut": {
+        "properties": {
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "ubicacion": {
+            "type": "string",
+            "title": "Ubicacion"
+          },
+          "fecha_hora": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fecha Hora"
+          }
+        },
+        "type": "object",
+        "required": [
+          "estado",
+          "ubicacion",
+          "fecha_hora"
+        ],
+        "title": "EventoOut"
+      },
+      "FolioDanoIn": {
+        "properties": {
+          "numero_guia": {
+            "type": "string",
+            "title": "Numero Guia",
+            "examples": [
+              "CBX-000001"
+            ]
+          },
+          "foto": {
+            "type": "string",
+            "title": "Foto",
+            "description": "Evidencia fotográfica obligatoria (RN-17)",
+            "examples": [
+              "dano.jpg"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero_guia",
+          "foto"
+        ],
+        "title": "FolioDanoIn"
+      },
+      "GuiaOut": {
+        "properties": {
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "nivel": {
+            "type": "string",
+            "title": "Nivel"
+          },
+          "tarifa": {
+            "type": "string",
+            "title": "Tarifa"
+          },
+          "fecha_estimada": {
+            "type": "string",
+            "format": "date",
+            "title": "Fecha Estimada"
+          },
+          "destino": {
+            "type": "string",
+            "title": "Destino"
+          },
+          "intentos_fallidos": {
+            "type": "integer",
+            "title": "Intentos Fallidos"
+          },
+          "con_garantia": {
+            "type": "boolean",
+            "title": "Con Garantia"
+          },
+          "cargos_adicionales": {
+            "type": "string",
+            "title": "Cargos Adicionales"
+          },
+          "reembolso": {
+            "type": "string",
+            "title": "Reembolso"
+          },
+          "compensacion": {
+            "type": "string",
+            "title": "Compensacion"
+          },
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje",
+            "description": "Texto entendible para el cliente"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "estado",
+          "nivel",
+          "tarifa",
+          "fecha_estimada",
+          "destino",
+          "intentos_fallidos",
+          "con_garantia",
+          "cargos_adicionales",
+          "reembolso",
+          "compensacion",
+          "mensaje"
+        ],
+        "title": "GuiaOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistorialOut": {
+        "properties": {
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "fecha_estimada": {
+            "type": "string",
+            "format": "date",
+            "title": "Fecha Estimada"
+          },
+          "eventos": {
+            "items": {
+              "$ref": "#/components/schemas/EventoOut"
+            },
+            "type": "array",
+            "title": "Eventos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "estado",
+          "fecha_estimada",
+          "eventos"
+        ],
+        "title": "HistorialOut"
+      },
+      "IncidenciaOut": {
+        "properties": {
+          "folio": {
+            "type": "string",
+            "title": "Folio"
+          },
+          "numero_guia": {
+            "type": "string",
+            "title": "Numero Guia"
+          },
+          "tipo": {
+            "type": "string",
+            "title": "Tipo"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "asignada_a": {
+            "type": "string",
+            "title": "Asignada A"
+          },
+          "resolucion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolucion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "folio",
+          "numero_guia",
+          "tipo",
+          "estado",
+          "asignada_a",
+          "resolucion"
+        ],
+        "title": "IncidenciaOut"
+      },
+      "IntentoFallidoIn": {
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "title": "Motivo",
+            "examples": [
+              "Destinatario ausente"
+            ]
+          },
+          "ubicacion": {
+            "type": "string",
+            "title": "Ubicacion",
+            "default": "Domicilio del destinatario"
+          }
+        },
+        "type": "object",
+        "required": [
+          "motivo"
+        ],
+        "title": "IntentoFallidoIn"
+      },
+      "MonitoreoOut": {
+        "properties": {
+          "ejecutado_en": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ejecutado En"
+          },
+          "alertas_generadas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Alertas Generadas"
+          },
+          "alertas_escaladas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Alertas Escaladas"
+          },
+          "guias_devueltas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Guias Devueltas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ejecutado_en",
+          "alertas_generadas",
+          "alertas_escaladas",
+          "guias_devueltas"
+        ],
+        "title": "MonitoreoOut"
+      },
+      "PaqueteIn": {
+        "properties": {
+          "peso_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Peso Kg",
+            "description": "Máximo 30 kg (RN-01)",
+            "examples": [
+              10
+            ]
+          },
+          "largo_cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Largo Cm",
+            "description": "Máximo 100 cm por lado (RN-01)",
+            "examples": [
+              40
+            ]
+          },
+          "ancho_cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Ancho Cm",
+            "examples": [
+              30
+            ]
+          },
+          "alto_cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Alto Cm",
+            "examples": [
+              20
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "peso_kg",
+          "largo_cm",
+          "ancho_cm",
+          "alto_cm"
+        ],
+        "title": "PaqueteIn"
+      },
+      "PersonaIn": {
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "title": "Nombre",
+            "examples": [
+              "Carlos Ruiz"
+            ]
+          },
+          "telefono": {
+            "type": "string",
+            "title": "Telefono",
+            "description": "10 dígitos",
+            "examples": [
+              "8112345678"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "nombre",
+          "telefono"
+        ],
+        "title": "PersonaIn"
+      },
+      "RegistrarGuiaIn": {
+        "properties": {
+          "remitente": {
+            "$ref": "#/components/schemas/PersonaIn"
+          },
+          "destinatario": {
+            "$ref": "#/components/schemas/PersonaIn"
+          },
+          "origen": {
+            "$ref": "#/components/schemas/DireccionIn"
+          },
+          "destino": {
+            "$ref": "#/components/schemas/DireccionIn"
+          },
+          "paquete": {
+            "$ref": "#/components/schemas/PaqueteIn"
+          },
+          "nivel": {
+            "type": "string",
+            "enum": [
+              "ESTANDAR",
+              "EXPRESS"
+            ],
+            "title": "Nivel",
+            "default": "ESTANDAR"
+          },
+          "valor_declarado": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Valor Declarado",
+            "examples": [
+              1200
+            ]
+          },
+          "sucursal": {
+            "type": "string",
+            "title": "Sucursal",
+            "examples": [
+              "Sucursal San Nicolás"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "remitente",
+          "destinatario",
+          "origen",
+          "destino",
+          "paquete",
+          "valor_declarado",
+          "sucursal"
+        ],
+        "title": "RegistrarGuiaIn"
+      },
+      "ResolucionIn": {
+        "properties": {
+          "resolucion": {
+            "type": "string",
+            "enum": [
+              "REEMBOLSO",
+              "REPOSICION",
+              "ATENDIDA"
+            ],
+            "title": "Resolucion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resolucion"
+        ],
+        "title": "ResolucionIn"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
