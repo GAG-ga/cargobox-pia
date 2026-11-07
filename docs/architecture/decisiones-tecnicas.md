@@ -67,6 +67,46 @@ Diagramas: [`diagramas/`](diagramas/) (capas, clases, secuencias y despliegue).
 | **I** — Segregación de interfaces | La consulta depende solo de `HistorialRastreoReader` (lectura); los comandos dependen de `GuiaRepository`. El servicio de entrega es el único que conoce `AlmacenEvidencias`. | `puertos.py` |
 | **D** — Inversión de dependencias | Dominio y aplicación dependen de interfaces; FastAPI, SQLAlchemy y el sistema de archivos se conectan desde afuera en `api/dependencias.py`. | `dependencias.py` |
 
+### 4.1 Demostración en el código
+
+**S — Responsabilidad única.** La máquina de estados solo decide si una transición existe. Quién la pide y qué evento genera es responsabilidad de la `Guia` (o de `OperacionServicio`):
+
+```python
+# src/domain/estados.py
+@classmethod
+def validar(cls, origen, destino) -> str:
+    if not cls.puede(origen, destino):
+        raise TransicionEstadoInvalida(f"{origen.value} → {destino.value} no está permitido")
+    return cls.TRANSICIONES[origen][destino]
+```
+
+**O — Abierto/cerrado.** Para agregar un nivel de servicio se crea una política nueva y `Cotizador` no se modifica:
+
+```python
+# src/domain/cotizador.py
+class TarifaExpress(PoliticaTarifa):
+    nivel = NivelServicio.EXPRESS
+    factor = Decimal("1.8")
+# Un nivel "Mismo día" sería: class TarifaMismoDia(PoliticaTarifa): ... y Cotizador([..., TarifaMismoDia()])
+```
+
+Lo mismo con las reglas: `BeneficioReferencia` se armó combinando Specifications existentes (`&`, `~`) sin tocar ninguna.
+
+**L — Sustitución de Liskov.** Los servicios reciben un `UnitOfWork`. En producción es `SqlAlchemyUnitOfWork` y en las pruebas de aceptación `UnitOfWorkEnMemoria` (`tests/fakes.py`). Las 54 pruebas de aceptación corren con el sustituto y el servicio no nota la diferencia.
+
+**I — Segregación de interfaces.** `ConsultaRastreoQueryService.__init__(self, lector: HistorialRastreoReader)` solo conoce el puerto de lectura y no el repositorio completo. `EntregaApplicationService` es el único que recibe `AlmacenEvidencias`.
+
+**D — Inversión de dependencias.** `servicios.py` depende de abstracciones (`application/puertos.py`: `UnitOfWork`, `PublicadorEventos`, `Reloj`). Las implementaciones concretas se conectan solo en `api/dependencias.py`:
+
+```python
+# src/api/dependencias.py
+def _args(self, reloj=None):
+    return SqlAlchemyUnitOfWork(self.sesiones), self.publicador, reloj or self.reloj
+
+def envios(self):
+    return EnvioApplicationService(*self._args())
+```
+
 ## 5. Configuración (12-Factor)
 
 | Variable | Uso | Ejemplo (`.env.example`) |

@@ -1,0 +1,21 @@
+﻿caso_id,operacion_id,accion_sugerida,estado_inicial,resultado_alumno,instrucciones,estado_final,eventos,excepcion
+CAR-S001,CAR-O001,completar,RECIBIDO,OK,Ejecutar la operacion y registrar evento o excepcion,ENTREGADO,"EstadoCambiado(CLASIFICADO), EstadoCambiado(EN_TRANSITO), EstadoCambiado(CENTRO_DESTINO), EstadoCambiado(EN_REPARTO), EstadoCambiado(ENTREGADO), EntregaCompletada",—
+CAR-S002,CAR-O002,cancelar,RECIBIDO,OK,Ejecutar la operacion y registrar evento o excepcion,CANCELADO,EstadoCambiado(CANCELADO),—
+CAR-S003,CAR-O003,repetir_aprobacion,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,CLASIFICADO,EstadoCambiado(CLASIFICADO),TransicionEstadoInvalida (CLASIFICADO → CLASIFICADO no está permitido)
+CAR-S004,CAR-O004,saltar_estado,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,TransicionEstadoInvalida (RECIBIDO → EN_TRANSITO no está permitido)
+CAR-S005,CAR-O005,aprobar,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,OperacionNoProcesable (servicio deshabilitado o sin capacidad)
+CAR-S006,CAR-O006,completar,RECIBIDO,OK,Ejecutar la operacion y registrar evento o excepcion,ENTREGADO,"EstadoCambiado(CLASIFICADO), EstadoCambiado(EN_TRANSITO), EstadoCambiado(CENTRO_DESTINO), EstadoCambiado(EN_REPARTO), EstadoCambiado(ENTREGADO), EntregaCompletada",—
+CAR-S007,CAR-O007,cancelar,RECIBIDO,OK,Ejecutar la operacion y registrar evento o excepcion,CANCELADO,EstadoCambiado(CANCELADO),—
+CAR-S008,CAR-O008,repetir_aprobacion,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,OperacionNoProcesable (sin autorización)
+CAR-S009,CAR-O009,saltar_estado,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,TransicionEstadoInvalida (RECIBIDO → EN_TRANSITO no está permitido)
+CAR-S010,CAR-O010,aprobar,RECIBIDO,OK,Ejecutar la operacion y registrar evento o excepcion,CLASIFICADO,EstadoCambiado(CLASIFICADO),—
+CAR-S011,CAR-O011,completar,RECIBIDO,OK,Ejecutar la operacion y registrar evento o excepcion,ENTREGADO,"EstadoCambiado(CLASIFICADO), EstadoCambiado(EN_TRANSITO), EstadoCambiado(CENTRO_DESTINO), EstadoCambiado(EN_REPARTO), EstadoCambiado(ENTREGADO), EntregaCompletada",—
+CAR-S012,CAR-O012,cancelar,RECIBIDO,OK,Ejecutar la operacion y registrar evento o excepcion,CANCELADO,EstadoCambiado(CANCELADO),—
+CAR-S013,CAR-O013,repetir_aprobacion,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,OperacionNoProcesable (sin servicios)
+CAR-S014,CAR-O014,saltar_estado,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,TransicionEstadoInvalida (RECIBIDO → EN_TRANSITO no está permitido)
+CAR-S015,CAR-O015,aprobar,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,OperacionNoProcesable (servicio deshabilitado o sin capacidad)
+CAR-S016,CAR-O016,completar,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,OperacionNoProcesable (remitente inactivo; sin autorización)
+CAR-S017,CAR-O017,cancelar,RECIBIDO,OK,Ejecutar la operacion y registrar evento o excepcion,CANCELADO,EstadoCambiado(CANCELADO),—
+CAR-S018,CAR-O018,repetir_aprobacion,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,OperacionNoProcesable (remitente inactivo)
+CAR-S019,CAR-O019,saltar_estado,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,TransicionEstadoInvalida (RECIBIDO → EN_TRANSITO no está permitido)
+CAR-S020,CAR-O020,aprobar,RECIBIDO,RECHAZADA,Ejecutar la operacion y registrar evento o excepcion,RECIBIDO,—,OperacionNoProcesable (remitente inactivo; servicio deshabilitado o sin capacidad)

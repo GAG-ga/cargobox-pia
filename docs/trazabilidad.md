@@ -20,6 +20,17 @@ Conecta cada necesidad del negocio (BRD §5) con su historia de usuario, sus reg
 | TR-03 | US14 Paquete dañado | RN-17 | `US14_paquete_danado.feature` | Atención al Cliente → folio de incidencia | `IncidenciaApplicationService.abrir_folio_dano` / `resolver` · `Incidencia` | `test_us14_paquete_danado.py` · `test_incidencia.py` | `POST /incidencias/danos` · `POST /incidencias/{folio}/resolucion` |
 | TR-03 | US15 Declaración de pérdida | RN-18 | `US15_declaracion_perdida.feature` | Timer > 10 días → Declarar pérdida y compensar | `IncidenciaApplicationService.declarar_perdida` · `Guia.declarar_perdida` · `PuedeDeclararsePerdida` | `test_us15_declaracion_perdida.py` | `POST /guias/{n}/perdida` |
 
+## Paquete de datos del docente
+
+| Regla del paquete | Componente | Prueba | Evidencia |
+|---|---|---|---|
+| `puede_procesarse` (activo AND línea AND autorización) | `PuedeProcesarse` en `domain/operacion_servicio.py` | `test_puede_procesarse_and` | `paquete-docente/casos_prueba_resultados.csv` (CAR-T001…T060) |
+| `beneficio_referencia` (preferente AND total ≥ 1500 AND NOT promoción) | `BeneficioReferencia` | `test_beneficio_referencia_and_not` | CAR-B001…B060 |
+| Capacidad / disponibilidad | `ServiciosConCapacidad` | `test_servicios_con_capacidad` | CAR-S005, S015, S020 |
+| Transiciones válidas e inválidas (RN-04, RN-09) | `MaquinaEstadosGuia` vía `OperacionServicio` | `test_saltar_estado_y_repetir_aprobacion_son_invalidos` | `paquete-docente/transiciones_prueba_resultados.csv` |
+
+Diferencias con el BRD: [`paquete-docente.md`](paquete-docente.md).
+
 ## Cobertura de reglas
 
 `tests/aceptacion/test_trazabilidad.py` verifica automáticamente que cada archivo `.feature` tenga su módulo de pruebas con al menos tantas pruebas como escenarios.

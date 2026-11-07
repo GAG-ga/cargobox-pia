@@ -67,3 +67,8 @@ class PerdidaNoDeclarable(ErrorDominio):  # RN-18
 
 class ResolucionInvalida(ErrorDominio):  # RN-17
     mensaje = "La resolución no es válida para este tipo de incidencia o ya fue resuelta."
+
+
+class OperacionNoProcesable(ErrorDominio):  # Paquete docente: puede_procesarse
+    mensaje = ("La operación no puede procesarse: el remitente debe estar activo, la operación debe "
+               "tener al menos un servicio, estar autorizada y los servicios deben tener capacidad.")

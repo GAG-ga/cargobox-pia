@@ -11,9 +11,11 @@ Caso 14 · Prof. Miguel Ángel Gómez Marroquín
 
 API REST que implementa el proceso de envíos de CargoBox: registro y cotización de guías, rastreo por escaneos, entregas con evidencia, resguardo y devolución, incidencias (alertas, escalamiento, daño y pérdida) y consultas para remitente y destinatario. Construida con **DDD**, **Specification**, **State Machine** y arquitectura por capas.
 
-- **Repositorio:** `https://github.com/GAG-ga/cargobox-pia`
+- **Repositorio:** https://github.com/GAG-ga/cargobox-pia
+- **Sistema desplegado (Swagger UI):** https://cargobox-api.onrender.com/docs
+- **Estado del servicio:** https://cargobox-api.onrender.com/salud
 
-- **Sistema desplegado (Swagger):** `https://cargobox-api.onrender.com/docs`
+> Render (plan gratuito) suspende el servicio sin uso: la primera petición puede tardar ~1 minuto en responder.
 
 ---
 
@@ -64,7 +66,17 @@ TEST_DATABASE_URL=postgresql+psycopg://usuario:clave@localhost:5432/cargobox_tes
 | Integración | `tests/api/` | HTTP → servicios → SQLAlchemy → SQLite/PostgreSQL; errores con mensaje para el cliente |
 | Trazabilidad | `tests/aceptacion/test_trazabilidad.py` | Cada `.feature` tiene su módulo de pruebas con al menos tantas pruebas como escenarios |
 
-Resultado actual: **227 pruebas, cobertura 99.6 %** (mínimo exigido 80 %).
+| Paquete del docente | `tests/unit/test_paquete_docente.py` | Los 120 casos y 20 transiciones de `datos/*.csv` (ver abajo) |
+
+Resultado actual: **255 pruebas, cobertura 99.6 %** (mínimo exigido 80 %).
+
+### Paquete de datos del docente (`datos/`)
+
+```bash
+python scripts/ejecutar_paquete_docente.py   # llena resultado_alumno + evidencia
+```
+
+Genera `docs/paquete-docente/casos_prueba_resultados.csv` y `transiciones_prueba_resultados.csv`. Las reglas `puede_procesarse` y `beneficio_referencia` son Specifications (AND/NOT), las transiciones usan la misma máquina de estados de la guía y publican `EstadoCambiado`. Las diferencias entre el modelo del paquete y nuestro BRD están en [`docs/paquete-docente.md`](docs/paquete-docente.md).
 
 **CI/CD** (`.github/workflows/ci.yml`): en cada push → Ruff → pruebas con SQLite → pruebas de integración contra **PostgreSQL** con cobertura ≥ 80 % → verificación de OpenAPI → `docker build` y arranque de la imagen.
 

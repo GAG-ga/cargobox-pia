@@ -11,3 +11,5 @@
 | `trazabilidad.md` | Necesidad → historia → regla → Gherkin → BPMN → código → pruebas |
 | `architecture/` | ADRs, decisiones técnicas (patrones y SOLID) y diagramas UML |
 | `api/openapi.json` | Especificación **OpenAPI 3.1** generada del código (`scripts/exportar_openapi.py`); Swagger UI en `/docs` |
+| `paquete-docente.md` | Ejecución de los 120 casos y 20 transiciones del paquete del docente y **diferencias** con nuestro BRD |
+| `paquete-docente/*.csv` | Resultados con `resultado_alumno` y evidencia por caso |

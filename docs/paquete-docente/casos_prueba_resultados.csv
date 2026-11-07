@@ -1,0 +1,121 @@
+﻿caso_id,operacion_id,tipo_prueba,regla_a_verificar,resultado_alumno,instrucciones,evidencia
+CAR-T001,CAR-O001,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B001,CAR-O001,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=9197.00; promocion=0
+CAR-T002,CAR-O002,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B002,CAR-O002,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=8203.00; promocion=0
+CAR-T003,CAR-O003,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B003,CAR-O003,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=1537.00; promocion=0
+CAR-T004,CAR-O004,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B004,CAR-O004,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=5555.00; promocion=0
+CAR-T005,CAR-O005,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B005,CAR-O005,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=6474.00; promocion=0
+CAR-T006,CAR-O006,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B006,CAR-O006,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=3024.00; promocion=0
+CAR-T007,CAR-O007,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B007,CAR-O007,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=3617.00; promocion=0
+CAR-T008,CAR-O008,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=0
+CAR-B008,CAR-O008,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=14543.00; promocion=0
+CAR-T009,CAR-O009,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B009,CAR-O009,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=4185.00; promocion=1
+CAR-T010,CAR-O010,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B010,CAR-O010,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=6975.00; promocion=0
+CAR-T011,CAR-O011,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B011,CAR-O011,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=6666.00; promocion=0
+CAR-T012,CAR-O012,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B012,CAR-O012,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=1228.00; promocion=0
+CAR-T013,CAR-O013,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=0; autorizado=1
+CAR-B013,CAR-O013,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=0.00; promocion=0
+CAR-T014,CAR-O014,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B014,CAR-O014,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=9055.00; promocion=0
+CAR-T015,CAR-O015,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B015,CAR-O015,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=1; total=1253.00; promocion=0
+CAR-T016,CAR-O016,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=2; autorizado=0
+CAR-B016,CAR-O016,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=8395.00; promocion=0
+CAR-T017,CAR-O017,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=3; autorizado=1
+CAR-B017,CAR-O017,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=8462.00; promocion=0
+CAR-T018,CAR-O018,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=1; autorizado=1
+CAR-B018,CAR-O018,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=7568.00; promocion=1
+CAR-T019,CAR-O019,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=2; autorizado=1
+CAR-B019,CAR-O019,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=2765.00; promocion=0
+CAR-T020,CAR-O020,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=3; autorizado=1
+CAR-B020,CAR-O020,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=11987.00; promocion=0
+CAR-T021,CAR-O021,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B021,CAR-O021,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=3333.00; promocion=0
+CAR-T022,CAR-O022,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B022,CAR-O022,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=6975.00; promocion=0
+CAR-T023,CAR-O023,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B023,CAR-O023,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=7802.00; promocion=0
+CAR-T024,CAR-O024,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=0
+CAR-B024,CAR-O024,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=3500.00; promocion=0
+CAR-T025,CAR-O025,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B025,CAR-O025,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=5221.00; promocion=0
+CAR-T026,CAR-O026,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B026,CAR-O026,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=7067.00; promocion=0
+CAR-T027,CAR-O027,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B027,CAR-O027,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=969.00; promocion=1
+CAR-T028,CAR-O028,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B028,CAR-O028,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=6975.00; promocion=0
+CAR-T029,CAR-O029,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B029,CAR-O029,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=11870.00; promocion=0
+CAR-T030,CAR-O030,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B030,CAR-O030,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=6432.00; promocion=0
+CAR-T031,CAR-O031,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B031,CAR-O031,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=3333.00; promocion=0
+CAR-T032,CAR-O032,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=0
+CAR-B032,CAR-O032,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=9431.00; promocion=0
+CAR-T033,CAR-O033,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B033,CAR-O033,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=2481.00; promocion=0
+CAR-T034,CAR-O034,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B034,CAR-O034,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=5555.00; promocion=0
+CAR-T035,CAR-O035,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B035,CAR-O035,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=6098.00; promocion=0
+CAR-T036,CAR-O036,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B036,CAR-O036,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=2932.00; promocion=1
+CAR-T037,CAR-O037,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B037,CAR-O037,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=7493.00; promocion=0
+CAR-T038,CAR-O038,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B038,CAR-O038,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=10759.00; promocion=0
+CAR-T039,CAR-O039,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=0; autorizado=1
+CAR-B039,CAR-O039,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=0.00; promocion=0
+CAR-T040,CAR-O040,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=0
+CAR-B040,CAR-O040,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=5555.00; promocion=0
+CAR-T041,CAR-O041,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B041,CAR-O041,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=11018.00; promocion=0
+CAR-T042,CAR-O042,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B042,CAR-O042,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=5296.00; promocion=0
+CAR-T043,CAR-O043,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B043,CAR-O043,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=5321.00; promocion=0
+CAR-T044,CAR-O044,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B044,CAR-O044,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=9715.00; promocion=0
+CAR-T045,CAR-O045,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B045,CAR-O045,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=1; total=1629.00; promocion=1
+CAR-T046,CAR-O046,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B046,CAR-O046,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=4135.00; promocion=0
+CAR-T047,CAR-O047,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B047,CAR-O047,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=8654.00; promocion=0
+CAR-T048,CAR-O048,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=0
+CAR-B048,CAR-O048,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=2364.00; promocion=0
+CAR-T049,CAR-O049,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B049,CAR-O049,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=11185.00; promocion=0
+CAR-T050,CAR-O050,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B050,CAR-O050,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=8771.00; promocion=0
+CAR-T051,CAR-O051,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B051,CAR-O051,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=1821.00; promocion=0
+CAR-T052,CAR-O052,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B052,CAR-O052,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=4135.00; promocion=0
+CAR-T053,CAR-O053,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=3; autorizado=1
+CAR-B053,CAR-O053,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=8746.00; promocion=0
+CAR-T054,CAR-O054,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=1; autorizado=1
+CAR-B054,CAR-O054,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=4160.00; promocion=1
+CAR-T055,CAR-O055,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,CUMPLE,Verificar precondiciones en dominio,activo=1; lineas=2; autorizado=1
+CAR-B055,CAR-O055,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=4469.00; promocion=0
+CAR-T056,CAR-O056,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=3; autorizado=0
+CAR-B056,CAR-O056,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=11419.00; promocion=0
+CAR-T057,CAR-O057,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=1; autorizado=1
+CAR-B057,CAR-O057,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=5037.00; promocion=0
+CAR-T058,CAR-O058,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=2; autorizado=1
+CAR-B058,CAR-O058,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=8395.00; promocion=0
+CAR-T059,CAR-O059,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=3; autorizado=1
+CAR-B059,CAR-O059,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,NO_CUMPLE,Composicion Specification AND/NOT,preferente=0; total=6950.00; promocion=0
+CAR-T060,CAR-O060,validar_operacion,validar cliente activo AND detalle no vacio AND autorizacion,NO_CUMPLE,Verificar precondiciones en dominio,activo=0; lineas=1; autorizado=1
+CAR-B060,CAR-O060,evaluar_beneficio,VIP AND total >=1500 AND NOT promocion,CUMPLE,Composicion Specification AND/NOT,preferente=1; total=1796.00; promocion=0
