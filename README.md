@@ -11,8 +11,9 @@ Caso 14 · Prof. Miguel Ángel Gómez Marroquín
 
 API REST que implementa el proceso de envíos de CargoBox: registro y cotización de guías, rastreo por escaneos, entregas con evidencia, resguardo y devolución, incidencias (alertas, escalamiento, daño y pérdida) y consultas para remitente y destinatario. Construida con **DDD**, **Specification**, **State Machine** y arquitectura por capas.
 
-- **Repositorio:** `https://github.com/<usuario>/cargobox-pia` *(completar)*
-- **Sistema desplegado (Swagger):** `https://cargobox-api.onrender.com/docs` *(completar)*
+- **Repositorio:** `https://github.com/GAG-ga/cargobox-pia`
+
+- **Sistema desplegado (Swagger):** `https://cargobox-api.onrender.com/docs`
 
 ---
 
