@@ -13,6 +13,8 @@ API REST que implementa el proceso de envíos de CargoBox: registro y cotizació
 
 - **Repositorio:** https://github.com/GAG-ga/cargobox-pia
 - **Sistema desplegado (Swagger UI):** https://cargobox-api.onrender.com/docs
+- **Panel de operaciones desplegado:** https://cargobox-api.onrender.com/panel/
+  (versión para usuarios; con [`/panel/?tecnico`](https://cargobox-api.onrender.com/panel/?tecnico) se ven los códigos US/RN, los errores de la API y la vista de Monitoreo para la evaluación)
 - **Estado del servicio:** https://cargobox-api.onrender.com/salud
 
 > Render (plan gratuito) suspende el servicio sin uso: la primera petición puede tardar ~1 minuto en responder.
@@ -23,6 +25,7 @@ API REST que implementa el proceso de envíos de CargoBox: registro y cotizació
 
 | Archivo | Qué hace |
 |---|---|
+| `ABRIR_PANEL.bat` | **Doble clic y listo:** arranca la API en una ventana minimizada ("CargoBox API") y abre el **panel de operaciones** en `http://localhost:8000/panel/`. La primera vez instala todo y carga la demo; si la API ya está corriendo, solo abre el navegador. Para detener la API, cerrar la ventana "CargoBox API". Tip: clic derecho → *Enviar a* → *Escritorio (crear acceso directo)*. |
 | `INICIAR.bat` | Crea el entorno, instala dependencias, carga datos de demo en `cargobox_demo.db` (SQLite) y abre **Swagger** en `http://localhost:8000/docs`. Para reiniciar la demo, borrar `cargobox_demo.db`. |
 | `PROBAR.bat` | Ruff + todas las pruebas con cobertura + abre el reporte HTML |
 
@@ -35,7 +38,7 @@ python -m venv .venv
 # Windows: .\.venv\Scripts\Activate.ps1      Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
 python scripts/cargar_demo.py              # opcional: guías de ejemplo
-uvicorn src.api.main:app --reload          # http://localhost:8000/docs
+uvicorn src.api.main:app --reload          # http://localhost:8000/docs  ·  panel: /panel/
 ```
 
 Sin `DATABASE_URL` se usa SQLite (`cargobox.db`). Para PostgreSQL, definir la variable (ver `.env.example`).
@@ -68,7 +71,7 @@ TEST_DATABASE_URL=postgresql+psycopg://usuario:clave@localhost:5432/cargobox_tes
 
 | Paquete del docente | `tests/unit/test_paquete_docente.py` | Los 120 casos y 20 transiciones de `datos/*.csv` (ver abajo) |
 
-Resultado actual: **255 pruebas, cobertura 99.6 %** (mínimo exigido 80 %).
+Resultado actual: **258 pruebas, cobertura 99.6 %** (mínimo exigido 80 %).
 
 ### Paquete de datos del docente (`datos/`)
 
