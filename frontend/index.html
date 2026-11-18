@@ -68,7 +68,7 @@
   .b-PERDIDO::before, .b-ESCALADA::before { background: #cc3333; }
 
   /* Conteo por estado */
-  .barra { display: grid; grid-template-columns: 110px 1fr 24px; align-items: center; gap: 8px; padding: 3px 0; }
+  .barra { display: grid; grid-template-columns: 150px 1fr 24px; align-items: center; gap: 8px; padding: 3px 0; }
   .barra .pista { background: #eef0f2; height: 8px; }
   .barra .relleno { height: 100%; }
   .barra em { font-style: normal; text-align: right; }
@@ -129,6 +129,20 @@
     .g2, .g-side, .f3, .f4 { grid-template-columns: 1fr; }
     nav .interior { overflow-x: auto; } .conexion input { width: 140px; }
   }
+  /* Modo usuario / modo técnico: lo técnico solo se ve con ?tecnico en la URL */
+  body:not(.tecnico) .tec, body:not(.tecnico) .us { display: none !important; }
+  .boton-abajo { display: flex; align-items: flex-end; }
+  input[type=file] { padding: 3px; font-size: 12px; }
+
+  @media (max-width: 600px) {
+    .col-msg { display: none; }
+    table:not(.det) { display: block; overflow-x: auto; }
+    .barra { grid-template-columns: 120px 1fr 24px; }
+    #toasts { left: 8px; right: 8px; }
+    nav .interior { flex-wrap: wrap; }
+    .encabezado h1 span { display: none; }
+    .titulo { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
 </style>
 </head>
 <body>
@@ -136,8 +150,8 @@
   <div class="interior">
     <h1>CargoBox <span>Sistema de envíos nacionales</span></h1>
     <div class="conexion">
-      <span class="punto" id="salud-punto"></span><span id="salud-texto">Sin verificar</span>
-      <label for="api-url">Servidor:</label><input id="api-url" spellcheck="false">
+      <span class="punto" id="salud-punto"></span><span id="salud-texto">Conectando…</span>
+      <span class="tec"><label for="api-url">Servidor:</label> <input id="api-url" spellcheck="false"></span>
     </div>
   </div>
 </div>
@@ -145,9 +159,9 @@
   <div class="interior">
     <button data-vista="resumen" class="activo">Inicio</button>
     <button data-vista="registrar">Nueva guía</button>
-    <button data-vista="guia">Consultar / operar guía</button>
+    <button data-vista="guia">Buscar guía</button>
     <button data-vista="incidencias">Incidencias</button>
-    <button data-vista="monitoreo">Monitoreo</button>
+    <button data-vista="monitoreo" class="tec">Monitoreo</button>
   </div>
 </nav>
 
@@ -155,40 +169,40 @@
   <!-- ============================ INICIO ============================ -->
   <section class="vista activa" id="v-resumen">
     <div class="titulo">
-      <div><h2>Inicio</h2><p>Guías en seguimiento e incidencias pendientes.</p></div>
+      <div><h2>Inicio</h2><p>Resumen de los envíos que estás siguiendo y de los problemas por atender.</p></div>
       <div class="acciones">
-        <button class="btn sec" id="btn-demo">Cargar guías de demo</button>
+        <button class="btn sec" id="btn-demo">Ver guías de ejemplo</button>
         <button class="btn" id="btn-actualizar">Actualizar</button>
       </div>
     </div>
     <div class="kpis">
-      <div class="kpi"><span>Guías en seguimiento</span><b id="k-total">0</b></div>
+      <div class="kpi"><span>Envíos en seguimiento</span><b id="k-total">0</b></div>
       <div class="kpi"><span>En camino</span><b id="k-camino">0</b></div>
-      <div class="kpi"><span>Entregadas</span><b id="k-entregadas">0</b></div>
-      <div class="kpi"><span>En resguardo</span><b id="k-resguardo">0</b></div>
-      <div class="kpi"><span>Incidencias pendientes</span><b id="k-incidencias">0</b></div>
+      <div class="kpi"><span>Entregados</span><b id="k-entregadas">0</b></div>
+      <div class="kpi"><span>Guardados en centro</span><b id="k-resguardo">0</b></div>
+      <div class="kpi"><span>Incidencias por atender</span><b id="k-incidencias">0</b></div>
     </div>
     <div class="grid g-side">
       <div class="card">
-        <h2>Guías <small>Haz clic en una guía para consultarla</small></h2>
+        <h2>Envíos <small>Haz clic en un envío para ver su detalle</small></h2>
         <table>
-          <thead><tr><th>Número</th><th>Estado</th><th>Fecha estimada</th><th>Mensaje al cliente</th><th></th></tr></thead>
+          <thead><tr><th>Número de guía</th><th>Etapa</th><th>Entrega estimada</th><th class="col-msg">Lo que ve el cliente</th><th></th></tr></thead>
           <tbody id="tabla-guias"></tbody>
         </table>
         <div class="cuerpo">
           <form class="buscador" id="form-seguir">
-            <input id="seguir-numero" placeholder="Agregar guía por número (ej. CBX-000006)" required>
-            <button class="btn sec">Agregar</button>
+            <input id="seguir-numero" placeholder="Escribe un número de guía para seguirlo (ej. CBX-000006)" required>
+            <button class="btn sec">Seguir</button>
           </form>
         </div>
       </div>
       <div>
         <div class="card">
-          <h2>Guías por estado</h2>
+          <h2>Envíos por etapa</h2>
           <div class="cuerpo" id="barras"></div>
         </div>
         <div class="card">
-          <h2>Incidencias pendientes <small>US12 / US13</small></h2>
+          <h2>Incidencias por atender <small class="tec">US12 / US13</small></h2>
           <div id="resumen-incidencias"></div>
         </div>
       </div>
@@ -197,47 +211,52 @@
 
   <!-- ============================ NUEVA GUÍA ============================ -->
   <section class="vista" id="v-registrar">
-    <div class="titulo"><div><h2>Nueva guía</h2><p>US01 · Registro del envío y cotización (RN-01 peso y medidas, RN-03 tarifa).</p></div></div>
+    <div class="titulo">
+      <div><h2>Nueva guía</h2><p>Captura los datos del envío. La tarifa y la fecha de entrega se calculan solas.
+        <span class="tec">US01 · RN-01 peso y medidas, RN-03 tarifa.</span></p></div>
+      <button type="button" class="btn sec" id="btn-ejemplo">Usar datos de ejemplo</button>
+    </div>
     <div class="grid g-side">
       <form class="card" id="form-registrar">
         <h2>Datos del envío</h2>
         <div class="cuerpo">
-          <fieldset><legend>Remitente</legend>
+          <fieldset><legend>Quién envía</legend>
             <div class="fila f2">
-              <label class="campo">Nombre<input name="rem_nombre" value="Carlos Ruiz" required></label>
-              <label class="campo">Teléfono (10 dígitos)<input name="rem_tel" value="8112345678" required></label>
+              <label class="campo">Nombre<input name="rem_nombre" placeholder="Carlos Ruiz" required></label>
+              <label class="campo">Teléfono (10 dígitos)<input name="rem_tel" placeholder="8112345678" inputmode="numeric" required></label>
             </div>
           </fieldset>
-          <fieldset><legend>Destinatario</legend>
+          <fieldset><legend>Quién recibe</legend>
             <div class="fila f2">
-              <label class="campo">Nombre<input name="des_nombre" value="Ana López" required></label>
-              <label class="campo">Teléfono (10 dígitos)<input name="des_tel" value="8187654321" required></label>
+              <label class="campo">Nombre<input name="des_nombre" placeholder="Ana López" required></label>
+              <label class="campo">Teléfono (10 dígitos)<input name="des_tel" placeholder="8187654321" inputmode="numeric" required></label>
             </div>
           </fieldset>
           <fieldset><legend>Direcciones</legend>
             <div class="fila f2">
-              <label class="campo">Calle de origen<input name="ori_calle" value="Av. Universidad 100" required></label>
-              <label class="campo">C.P. origen<input name="ori_cp" value="66450" required></label>
+              <label class="campo">Calle y número de origen<input name="ori_calle" placeholder="Av. Universidad 100" required></label>
+              <label class="campo">Código postal de origen<input name="ori_cp" placeholder="66450" inputmode="numeric" required></label>
             </div>
             <div class="fila f2">
-              <label class="campo">Calle de destino<input name="des_calle" value="Calle Roble 10" required></label>
-              <label class="campo">C.P. destino<input name="des_cp" value="66220" required></label>
+              <label class="campo">Calle y número de destino<input name="des_calle" placeholder="Calle Roble 10" required></label>
+              <label class="campo">Código postal de destino<input name="des_cp" placeholder="66220" inputmode="numeric" required></label>
             </div>
           </fieldset>
           <fieldset><legend>Paquete</legend>
             <div class="fila f4">
-              <label class="campo">Peso (kg)<input name="peso" type="number" step="0.1" value="10" required></label>
-              <label class="campo">Largo (cm)<input name="largo" type="number" step="0.1" value="40" required></label>
-              <label class="campo">Ancho (cm)<input name="ancho" type="number" step="0.1" value="30" required></label>
-              <label class="campo">Alto (cm)<input name="alto" type="number" step="0.1" value="20" required></label>
+              <label class="campo">Peso (kg)<input name="peso" type="number" step="0.1" min="0" placeholder="10" required></label>
+              <label class="campo">Largo (cm)<input name="largo" type="number" step="0.1" min="0" placeholder="40" required></label>
+              <label class="campo">Ancho (cm)<input name="ancho" type="number" step="0.1" min="0" placeholder="30" required></label>
+              <label class="campo">Alto (cm)<input name="alto" type="number" step="0.1" min="0" placeholder="20" required></label>
             </div>
+            <p class="nota" style="margin:0 0 8px">Máximo 30 kg y 100 cm por lado. Los paquetes más grandes se envían como carga especial.</p>
           </fieldset>
           <div class="fila f3">
-            <label class="campo">Nivel de servicio
-              <select name="nivel"><option value="ESTANDAR">Estándar</option><option value="EXPRESS">Express</option></select>
+            <label class="campo">Tipo de servicio
+              <select name="nivel"><option value="ESTANDAR">Estándar</option><option value="EXPRESS">Express (más rápido)</option></select>
             </label>
-            <label class="campo">Valor declarado ($)<input name="valor" type="number" step="0.01" value="1200" required></label>
-            <label class="campo">Sucursal<input name="sucursal" value="Sucursal San Nicolás" required></label>
+            <label class="campo">Valor del contenido ($)<input name="valor" type="number" step="0.01" min="0" placeholder="1200" required></label>
+            <label class="campo">Sucursal<input name="sucursal" placeholder="Sucursal San Nicolás" required></label>
           </div>
           <button class="btn">Registrar guía</button>
         </div>
@@ -245,16 +264,17 @@
       <div class="card">
         <h2>Guía generada</h2>
         <div class="cuerpo">
-          <div id="registro-resultado"><p class="vacio">Todavía no se ha registrado ninguna guía.</p></div>
-          <p class="nota">Para probar la regla RN-01, registra un paquete de 31 kg: la API lo rechaza como carga especial.</p>
+          <div id="registro-resultado"><p class="vacio">Aquí aparecerá el número de guía, la tarifa y la fecha de entrega.</p></div>
+          <p class="nota tec">Para probar RN-01, registra un paquete de 31 kg: la API lo rechaza como carga especial.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============================ CONSULTAR / OPERAR ============================ -->
+  <!-- ============================ BUSCAR / OPERAR ============================ -->
   <section class="vista" id="v-guia">
-    <div class="titulo"><div><h2>Consultar / operar guía</h2><p>Estado (US08), historial del remitente (US09) y operaciones del ciclo de vida.</p></div></div>
+    <div class="titulo"><div><h2>Buscar guía</h2><p>Consulta dónde va un envío y realiza las acciones disponibles.
+      <span class="tec">US08 estado, US09 historial y operaciones del ciclo de vida.</span></p></div></div>
     <div class="card"><div class="cuerpo">
       <form class="buscador" id="form-buscar">
         <input id="buscar-numero" placeholder="Número de guía (ej. CBX-000001)" required>
@@ -265,125 +285,125 @@
     <div id="guia-contenido" style="display:none">
       <div class="card">
         <h2><span>Guía <span class="mono" id="g-numero"></span> — <span id="g-badge"></span></span>
-            <button class="btn sec chico" id="btn-recargar">Recargar</button></h2>
+            <button class="btn sec chico" id="btn-recargar">Actualizar</button></h2>
         <div class="cuerpo">
           <div class="pasos" id="g-pasos"></div>
           <div class="aviso-final" id="g-aviso"></div>
-          <table class="det">
-            <tr><th>Fecha estimada</th><td id="g-fecha">—</td><th>Nivel</th><td id="g-nivel">—</td></tr>
-            <tr><th>Tarifa</th><td id="g-tarifa">—</td><th>Intentos fallidos</th><td id="g-intentos">—</td></tr>
-            <tr><th>Destino</th><td id="g-destino">—</td><th>Con garantía</th><td id="g-garantia">—</td></tr>
-            <tr><th>Cargos adicionales</th><td id="g-cargos">—</td><th>Reembolso / compensación</th><td id="g-reembolso">—</td></tr>
-          </table>
-          <div class="msg-cliente"><b>Mensaje al cliente:</b> <span id="g-mensaje"></span></div>
-          <p class="nota">Nivel, tarifa y montos aparecen después de registrar u operar la guía desde aquí; la consulta pública (US08) solo devuelve estado, fecha y mensaje.</p>
+          <table class="det" id="g-detalle"></table>
+          <div class="msg-cliente"><b>Lo que ve el cliente:</b> <span id="g-mensaje"></span></div>
+          <p class="nota tec">Nivel, tarifa y montos aparecen después de registrar u operar la guía desde aquí; la consulta pública (US08) solo devuelve estado, fecha y mensaje.</p>
         </div>
       </div>
 
       <div class="grid g2">
         <div class="card">
-          <h2>Operaciones <label class="check"><input type="checkbox" id="ver-todas"> Mostrar todas</label></h2>
+          <h2>Acciones disponibles <label class="check tec"><input type="checkbox" id="ver-todas"> Mostrar todas</label></h2>
           <div class="cuerpo">
-            <p class="nota" style="margin:0 0 10px">Solo se muestran las operaciones permitidas para el estado actual. Con “Mostrar todas” puedes probar cómo la API rechaza las demás.</p>
+            <p class="nota" style="margin:0 0 10px">Solo aparecen las acciones que se pueden hacer en la etapa actual del envío.
+              <span class="tec">Con “Mostrar todas” puedes probar cómo la API rechaza las demás.</span></p>
 
-            <div class="op" data-estados="RECIBIDO,CLASIFICADO,EN_TRANSITO,CENTRO_DESTINO">
-              <h3>Registrar escaneo <span class="us">US04</span></h3>
-              <p>Mueve la guía al siguiente punto de su ruta.</p>
+            <div class="op" data-op="escaneo" data-estados="RECIBIDO,CLASIFICADO,EN_TRANSITO,CENTRO_DESTINO">
+              <h3>Registrar avance del paquete <span class="us">US04</span></h3>
+              <p>Indica a qué etapa pasa el paquete y dónde se escaneó.</p>
               <form id="op-escaneo" class="fila f3">
-                <select name="nuevo_estado">
-                  <option>CLASIFICADO</option><option>EN_TRANSITO</option><option>CENTRO_DESTINO</option><option>EN_REPARTO</option>
-                </select>
-                <input name="ubicacion" value="CEDIS Monterrey" required>
-                <div><button class="btn chico">Registrar</button></div>
+                <label class="campo">Nueva etapa
+                  <select name="nuevo_estado">
+                    <option value="CLASIFICADO">Clasificado</option><option value="EN_TRANSITO">En tránsito</option>
+                    <option value="CENTRO_DESTINO">Centro destino</option><option value="EN_REPARTO">En reparto</option>
+                  </select></label>
+                <label class="campo">Lugar<input name="ubicacion" placeholder="CEDIS Monterrey" required></label>
+                <div class="boton-abajo"><button class="btn chico">Registrar avance</button></div>
               </form>
             </div>
 
-            <div class="op" data-estados="EN_REPARTO">
-              <h3>Intento de entrega fallido <span class="us">US05</span></h3>
-              <p>Al segundo intento la guía pasa a resguardo (RN-06).</p>
+            <div class="op" data-op="intento" data-estados="EN_REPARTO">
+              <h3>No se pudo entregar <span class="us">US05</span></h3>
+              <p>Si es el segundo intento, el paquete se guarda en el centro de distribución.<span class="tec"> (RN-06)</span></p>
               <form id="op-intento" class="fila f3">
-                <input name="motivo" value="Destinatario ausente" required>
-                <input name="ubicacion" value="Domicilio del destinatario">
-                <div><button class="btn chico">Registrar</button></div>
+                <label class="campo">Motivo<input name="motivo" placeholder="Destinatario ausente" required></label>
+                <label class="campo">Lugar<input name="ubicacion" value="Domicilio del destinatario"></label>
+                <div class="boton-abajo"><button class="btn chico">Registrar intento</button></div>
               </form>
             </div>
 
-            <div class="op" data-estados="EN_REPARTO,EN_RESGUARDO">
-              <h3>Entrega con evidencia <span class="us">US06 / US07 / US10</span></h3>
-              <p>Firma y foto obligatorias (RN-07). Marca “tercero” si recibe un vecino o portero.</p>
+            <div class="op" data-op="entrega" data-estados="EN_REPARTO,EN_RESGUARDO">
+              <h3>Registrar entrega <span class="us">US06 / US07 / US10</span></h3>
+              <p>Se necesitan la firma, una foto del paquete entregado y el nombre de quien recibe.<span class="tec"> (RN-07)</span></p>
               <form id="op-entrega">
                 <div class="fila f3">
-                  <input name="nombre_receptor" value="Ana López" placeholder="Quién recibe" required>
-                  <input name="firma_digital" value="firma-ana.png" placeholder="Firma">
-                  <input name="foto" value="foto-paquete.jpg" placeholder="Foto">
+                  <label class="campo">Quién recibe<input name="nombre_receptor" placeholder="Ana López" required></label>
+                  <label class="campo">Firma (imagen)<input name="firma_digital" type="file" accept="image/*"></label>
+                  <label class="campo">Foto del paquete<input name="foto" type="file" accept="image/*"></label>
                 </div>
                 <div class="fila f2">
-                  <input name="ubicacion" value="Domicilio del destinatario">
-                  <label class="check"><input type="checkbox" name="es_tercero"> Recibe un tercero</label>
+                  <label class="campo">Lugar<input name="ubicacion" value="Domicilio del destinatario"></label>
+                  <label class="check"><input type="checkbox" name="es_tercero"> Recibió otra persona (vecino, portero…)</label>
                 </div>
                 <button class="btn chico">Registrar entrega</button>
               </form>
             </div>
 
-            <div class="op" data-estados="EN_RESGUARDO">
-              <h3>Reagendar visita <span class="us">US10</span></h3>
-              <p>Solo una vez y dentro de los 5 días hábiles de resguardo (RN-13).</p>
-              <button class="btn chico" id="op-reagendar">Reagendar</button>
+            <div class="op" data-op="reagendar" data-estados="EN_RESGUARDO">
+              <h3>Programar nueva visita <span class="us">US10</span></h3>
+              <p>El repartidor vuelve a intentar la entrega. Solo se puede una vez y dentro de 5 días hábiles.<span class="tec"> (RN-13)</span></p>
+              <button class="btn chico" id="op-reagendar">Programar visita</button>
             </div>
 
-            <div class="op" data-estados="RECIBIDO">
-              <h3>Corregir datos <span class="us">US03</span></h3>
-              <p>Solo antes de clasificar (RN-10). Deja en blanco lo que no cambia.</p>
+            <div class="op" data-op="corregir" data-estados="RECIBIDO">
+              <h3>Corregir direcciones <span class="us">US03</span></h3>
+              <p>Solo antes de que el paquete se clasifique. Si corriges una dirección, llena su calle <b>y</b> su código postal;
+                 deja en blanco la que no cambia.<span class="tec"> (RN-10)</span></p>
               <form id="op-corregir">
-                <div class="fila f2"><input name="ori_calle" placeholder="Calle de origen"><input name="ori_cp" placeholder="C.P. origen"></div>
-                <div class="fila f2"><input name="des_calle" placeholder="Calle de destino"><input name="des_cp" placeholder="C.P. destino"></div>
-                <button class="btn chico">Guardar</button>
+                <div class="fila f2"><input name="ori_calle" placeholder="Calle de origen"><input name="ori_cp" placeholder="C.P. de origen"></div>
+                <div class="fila f2"><input name="des_calle" placeholder="Calle de destino"><input name="des_cp" placeholder="C.P. de destino"></div>
+                <button class="btn chico">Guardar cambios</button>
               </form>
             </div>
 
-            <div class="op" data-estados="CLASIFICADO,EN_TRANSITO,CENTRO_DESTINO">
-              <h3>Cambio de dirección <span class="us">US11</span></h3>
-              <p>Cargo de $80; la guía pierde la garantía. Requiere validar identidad (RN-14).</p>
+            <div class="op" data-op="cambio-direccion" data-estados="EN_TRANSITO,CENTRO_DESTINO">
+              <h3>Cambiar dirección de entrega <span class="us">US11</span></h3>
+              <p>Disponible mientras el paquete va en camino. Tiene un costo de $80 y el envío pierde la garantía de fecha.<span class="tec"> (RN-14)</span></p>
               <form id="op-direccion">
-                <div class="fila f2"><input name="calle" placeholder="Nueva calle" required><input name="cp" placeholder="C.P." required></div>
+                <div class="fila f2"><input name="calle" placeholder="Nueva calle y número" required><input name="cp" placeholder="Código postal" inputmode="numeric" required></div>
                 <div class="fila f2">
-                  <label class="check"><input type="checkbox" name="identidad" checked> Identidad validada</label>
+                  <label class="check"><input type="checkbox" name="identidad"> Ya verifiqué la identidad del destinatario</label>
                   <div><button class="btn chico">Cambiar dirección</button></div>
                 </div>
               </form>
             </div>
 
-            <div class="op" data-estados="RECIBIDO">
-              <h3>Cancelar guía <span class="us">US02</span></h3>
-              <p>Solo antes de que se clasifique (RN-09).</p>
-              <button class="btn peligro chico" id="op-cancelar">Cancelar guía</button>
+            <div class="op" data-op="cancelar" data-estados="RECIBIDO">
+              <h3>Cancelar envío <span class="us">US02</span></h3>
+              <p>Solo mientras el paquete no se haya clasificado.<span class="tec"> (RN-09)</span></p>
+              <button class="btn peligro chico" id="op-cancelar">Cancelar envío</button>
             </div>
 
-            <div class="op" data-estados="EN_TRANSITO,CENTRO_DESTINO,EN_REPARTO">
-              <h3>Declarar pérdida <span class="us">US15</span></h3>
-              <p>Calcula la compensación según el valor declarado (RN-18).</p>
-              <button class="btn peligro chico" id="op-perdida">Declarar pérdida</button>
+            <div class="op" data-op="perdida" data-estados="EN_TRANSITO,CENTRO_DESTINO,EN_REPARTO">
+              <h3>Declarar paquete perdido <span class="us">US15</span></h3>
+              <p>Se usa cuando el paquete lleva <b>más de 10 días</b> sin movimiento. Se calcula una compensación según el valor del contenido.<span class="tec"> (RN-18)</span></p>
+              <button class="btn peligro chico" id="op-perdida">Declarar perdido</button>
             </div>
 
-            <div class="op" data-estados="ENTREGADO">
+            <div class="op" data-op="dano" data-estados="ENTREGADO">
               <h3>Reportar paquete dañado <span class="us">US14</span></h3>
-              <p>Abre un folio con evidencia fotográfica (RN-17).</p>
+              <p>Adjunta una foto del daño. Se abre un folio para el supervisor de la sucursal.<span class="tec"> (RN-17)</span></p>
               <form id="op-dano" class="fila f3">
-                <input name="foto" value="dano.jpg" placeholder="Foto del daño">
-                <div><button class="btn chico">Abrir folio</button></div>
+                <label class="campo">Foto del daño<input name="foto" type="file" accept="image/*"></label>
+                <div class="boton-abajo"><button class="btn chico">Reportar daño</button></div>
               </form>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <h2>Historial del remitente <small>US09</small></h2>
+          <h2>Historial de movimientos <small class="tec">US09</small></h2>
           <div class="cuerpo">
             <form class="buscador" id="form-historial">
-              <input id="historial-tel" placeholder="Teléfono del remitente" value="8112345678" required>
-              <button class="btn sec">Ver historial</button>
+              <input id="historial-tel" placeholder="Teléfono de quien envía (10 dígitos)" inputmode="numeric" required>
+              <button class="btn sec">Ver movimientos</button>
             </form>
-            <p class="nota">Con un teléfono distinto la API responde AccesoDenegado (RN-08).</p>
+            <p class="nota">Por seguridad, solo se muestra con el teléfono de quien envió el paquete.
+              <span class="tec">En la demo es 8112345678; con otro teléfono la API responde AccesoDenegado (RN-08).</span></p>
             <div class="resultado" id="historial"></div>
           </div>
         </div>
@@ -394,30 +414,31 @@
   <!-- ============================ INCIDENCIAS ============================ -->
   <section class="vista" id="v-incidencias">
     <div class="titulo">
-      <div><h2>Incidencias</h2><p>Alertas por retraso (US12), escalamiento (US13) y folios por daño (US14).</p></div>
+      <div><h2>Incidencias</h2><p>Envíos retrasados y paquetes dañados que necesitan atención.
+        <span class="tec">US12 alertas, US13 escalamiento, US14 folios por daño.</span></p></div>
       <button class="btn" id="btn-incidencias">Actualizar</button>
     </div>
     <div class="grid g-side">
       <div class="card">
-        <h2>Pendientes <small>abiertas y escaladas</small></h2>
+        <h2>Por atender</h2>
         <table>
-          <thead><tr><th>Folio</th><th>Guía</th><th>Tipo</th><th>Estado</th><th>Asignada a</th><th>Resolver</th></tr></thead>
+          <thead><tr><th>Folio</th><th>Guía</th><th>Problema</th><th>Situación</th><th>Responsable</th><th>Acción</th></tr></thead>
           <tbody id="tabla-incidencias"></tbody>
         </table>
       </div>
       <form class="card" id="form-dano">
-        <h2>Abrir folio por daño <small>US14</small></h2>
+        <h2>Reportar paquete dañado <small class="tec">US14</small></h2>
         <div class="cuerpo">
           <div class="fila"><label class="campo">Número de guía<input name="numero_guia" placeholder="CBX-000001" required></label></div>
-          <div class="fila"><label class="campo">Foto (obligatoria)<input name="foto" value="dano.jpg"></label></div>
-          <button class="btn">Abrir folio</button>
-          <p class="nota">Se asigna al supervisor de la sucursal de origen.</p>
+          <div class="fila"><label class="campo">Foto del daño<input name="foto" type="file" accept="image/*"></label></div>
+          <button class="btn">Reportar daño</button>
+          <p class="nota">El reporte se asigna al supervisor de la sucursal donde se envió el paquete.</p>
         </div>
       </form>
     </div>
   </section>
 
-  <!-- ============================ MONITOREO ============================ -->
+  <!-- ============================ MONITOREO (solo modo técnico) ============================ -->
   <section class="vista" id="v-monitoreo">
     <div class="titulo"><div><h2>Monitoreo de reglas de tiempo</h2><p>US10 / US12 / US13 · Genera alertas, escala las que siguen abiertas y devuelve resguardos vencidos.</p></div></div>
     <div class="grid g-side">
@@ -443,7 +464,7 @@
     </div>
   </section>
 </main>
-<footer>CargoBox · PIA Componentes de Lógica de Negocios · FIME UANL</footer>
+<footer>CargoBox · PIA Componentes de Lógica de Negocios · FIME UANL<span class="tec"> · modo técnico</span></footer>
 <div id="toasts"></div>
 
 <script>
@@ -460,7 +481,14 @@ const COLORES = { RECIBIDO: "#8a90a0", CLASIFICADO: "#6f9be8", EN_TRANSITO: "#2f
                   CANCELADO: "#b8bcc6", PERDIDO: "#d23c3c" };
 const NOMBRES = { RECIBIDO: "Recibido", CLASIFICADO: "Clasificado", EN_TRANSITO: "En tránsito",
                   CENTRO_DESTINO: "Centro destino", EN_REPARTO: "En reparto", ENTREGADO: "Entregado",
-                  EN_RESGUARDO: "En resguardo", DEVUELTO: "Devuelto", CANCELADO: "Cancelado", PERDIDO: "Perdido" };
+                  EN_RESGUARDO: "Guardado en centro", DEVUELTO: "Devuelto al remitente", CANCELADO: "Cancelado",
+                  PERDIDO: "Perdido", ABIERTA: "Abierta", ESCALADA: "Escalada", RESUELTA: "Resuelta" };
+const TIPOS_INCIDENCIA = { RETRASO: "Envío retrasado", DANO: "Paquete dañado" };
+const NIVELES = { ESTANDAR: "Estándar", EXPRESS: "Express" };
+const RESOLUCIONES = { REEMBOLSO: "Reembolso", REPOSICION: "Reposición", ATENDIDA: "Atendida" };
+// Modo técnico (para la evaluación): /panel/?tecnico muestra servidor, códigos US/RN, errores de la API y Monitoreo.
+const TECNICO = new URLSearchParams(location.search).has("tecnico");
+document.body.classList.toggle("tecnico", TECNICO);
 const DEMO = ["CBX-000001", "CBX-000002", "CBX-000003", "CBX-000004", "CBX-000005"];
 
 const $ = (sel, raiz = document) => raiz.querySelector(sel);
@@ -469,6 +497,7 @@ const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const badge = (estado) => `<span class="badge b-${esc(estado)}">${esc(NOMBRES[estado] || estado)}</span>`;
 const fecha = (iso) => iso ? new Date(iso + (iso.length === 10 ? "T12:00:00" : "")).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 const dinero = (v) => v === undefined || v === null || v === "" ? "—" : (String(v).startsWith("$") ? v : "$" + v);
+const hayMonto = (v) => v !== undefined && v !== null && Number(String(v).replace("$", "")) > 0;
 const fechaHora = (iso) => new Date(iso).toLocaleString("es-MX", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
 function leer(clave, defecto) {
@@ -491,6 +520,8 @@ function toast(titulo, texto = "", error = false) {
   t.className = "toast" + (error ? " error" : "");
   t.innerHTML = `<b>${esc(titulo)}</b>${esc(texto)}`;
   $("#toasts").appendChild(t);
+  // Máximo 3 avisos a la vez para no tapar la pantalla
+  while ($("#toasts").children.length > 3) $("#toasts").firstElementChild.remove();
   setTimeout(() => t.remove(), error ? 7000 : 4000);
 }
 
@@ -504,15 +535,23 @@ async function api(metodo, ruta, cuerpo) {
       body: cuerpo ? JSON.stringify(cuerpo) : undefined,
     });
   } catch {
-    toast("No hay conexión con la API", `Revisa que esté corriendo en ${API}`, true);
+    avisarSinConexion();
     throw new Error("sin-conexion");
   }
   const datos = await resp.json().catch(() => ({}));
   if (!resp.ok) {
-    toast(datos.error || `Error ${resp.status}`, datos.mensaje || "La operación no se pudo completar.", true);
+    // El usuario ve un título claro y la explicación de la API; el código técnico solo en modo técnico.
+    const titulo = TECNICO ? (datos.error || `Error ${resp.status}`)
+      : resp.status === 404 ? "No encontrado" : "No se pudo completar";
+    toast(titulo, datos.mensaje || "Intenta de nuevo en un momento.", true);
     throw Object.assign(new Error(datos.error), { estado: resp.status, datos });
   }
   return datos;
+}
+
+function avisarSinConexion() {
+  toast("Sin conexión con el sistema",
+        TECNICO ? `Revisa que la API esté corriendo en ${API}` : "Intenta de nuevo en un momento.", true);
 }
 
 function recordarGuia(datos) {
@@ -524,6 +563,7 @@ function recordarGuia(datos) {
    Navegación y salud de la API
    ======================================================================== */
 function irA(vista) {
+  if (vista === "monitoreo" && !TECNICO) vista = "resumen";
   $$("nav button").forEach((b) => b.classList.toggle("activo", b.dataset.vista === vista));
   $$(".vista").forEach((v) => v.classList.toggle("activa", v.id === "v-" + vista));
   if (vista === "incidencias") cargarIncidencias();
@@ -536,10 +576,10 @@ async function verificarSalud() {
     const r = await fetch(API.replace(/\/$/, "") + "/salud");
     const d = await r.json();
     punto.className = "punto ok";
-    texto.textContent = `API activa · ${d.entorno}`;
+    texto.textContent = TECNICO ? `API activa · ${d.entorno}` : "Conectado";
   } catch {
     punto.className = "punto bad";
-    texto.textContent = "API sin conexión";
+    texto.textContent = "Sin conexión";
   }
 }
 $("#api-url").value = API;
@@ -577,10 +617,10 @@ function pintarResumen() {
   $("#tabla-guias").innerHTML = lista.length ? lista.map((g) => `
     <tr class="clic" data-numero="${esc(g.numero)}">
       <td class="mono">${esc(g.numero)}</td><td>${badge(g.estado)}</td><td>${fecha(g.fecha_estimada)}</td>
-      <td class="gris">${esc(g.mensaje)}</td>
-      <td><button class="btn sec chico" data-quitar="${esc(g.numero)}" title="Quitar de la lista">Quitar</button></td>
+      <td class="gris col-msg">${esc(g.mensaje)}</td>
+      <td><button class="btn sec chico" data-quitar="${esc(g.numero)}" title="Deja de mostrarlo en esta lista (el envío no se borra)">Ocultar</button></td>
     </tr>`).join("")
-    : `<tr><td colspan="5" class="vacio">No hay guías en seguimiento. Registra una o usa “Cargar guías de demo”.</td></tr>`;
+    : `<tr><td colspan="5" class="vacio">Todavía no sigues ningún envío. Registra una guía nueva o escribe un número abajo.</td></tr>`;
 
   const max = Math.max(1, ...ESTADOS.map((e) => cuenta(e)));
   $("#barras").innerHTML = ESTADOS.map((e) => `
@@ -590,9 +630,9 @@ function pintarResumen() {
 
   const inc = Array.isArray(incidencias) ? incidencias : [];
   $("#resumen-incidencias").innerHTML = inc.length ? `<table><tbody>${inc.slice(0, 6).map((i) => `
-      <tr><td class="mono">${esc(i.folio)}</td><td>${esc(i.tipo)}</td><td>${badge(i.estado)}</td><td class="mono">${esc(i.numero_guia)}</td></tr>`).join("")}
+      <tr><td class="mono">${esc(i.folio)}</td><td>${esc(TIPOS_INCIDENCIA[i.tipo] || i.tipo)}</td><td>${badge(i.estado)}</td><td class="mono">${esc(i.numero_guia)}</td></tr>`).join("")}
     </tbody></table>${inc.length > 6 ? `<p class="nota">y ${inc.length - 6} más…</p>` : ""}`
-    : `<p class="vacio">No hay incidencias pendientes.</p>`;
+    : `<p class="vacio">No hay incidencias por atender.</p>`;
 }
 
 $("#tabla-guias").addEventListener("click", (e) => {
@@ -607,15 +647,17 @@ $("#tabla-guias").addEventListener("click", (e) => {
 });
 $("#btn-actualizar").addEventListener("click", actualizarResumen);
 $("#btn-demo").addEventListener("click", async () => {
-  DEMO.forEach((n) => { if (!guias[n]) guias[n] = { numero: n, estado: "RECIBIDO" }; });
+  // Solo agrega las guías de demo que existen en esta base (si no se cargó la demo, no agrega nada)
+  let agregadas = 0, sinConexion = false;
+  await Promise.all(DEMO.map(async (n) => {
+    try {
+      const r = await fetch(`${API.replace(/\/$/, "")}/rastreo/${n}`);
+      if (r.ok) { recordarGuia(await r.json()); agregadas++; }
+    } catch { sinConexion = true; }
+  }));
+  if (sinConexion) avisarSinConexion();
+  else if (!agregadas) toast("No hay guías de ejemplo", "Este sistema no tiene cargadas las guías CBX-000001 a CBX-000005.", true);
   await actualizarResumen();
-  // Quita las que no existen en esta base (por ejemplo, si no se cargó la demo)
-  for (const n of DEMO) {
-    const r = await fetch(`${API.replace(/\/$/, "")}/rastreo/${n}`).catch(() => null);
-    if (r && r.status === 404) delete guias[n];
-  }
-  guardar("cbx_guias", guias);
-  pintarResumen();
 });
 $("#form-seguir").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -630,6 +672,10 @@ $("#form-seguir").addEventListener("submit", async (e) => {
 /* ========================================================================
    Registrar guía (US01)
    ======================================================================== */
+// Llena el formulario con los ejemplos que muestran los campos (útil para una demostración rápida)
+$("#btn-ejemplo").addEventListener("click", () => {
+  $$("#form-registrar input").forEach((i) => { if (i.placeholder) i.value = i.placeholder; });
+});
 $("#form-registrar").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
@@ -645,16 +691,17 @@ $("#form-registrar").addEventListener("submit", async (e) => {
     const g = await api("POST", "/guias", cuerpo);
     recordarGuia({ ...g, telefono_remitente: f.rem_tel });
     toast("Guía generada", `${g.numero} · tarifa ${dinero(g.tarifa)}`);
+    e.target.reset();
     $("#registro-resultado").innerHTML = `
       <table class="det">
         <tr><th>Número de guía</th><td class="mono"><b>${esc(g.numero)}</b></td></tr>
         <tr><th>Tarifa</th><td>${esc(dinero(g.tarifa))}</td></tr>
-        <tr><th>Fecha estimada</th><td>${fecha(g.fecha_estimada)}</td></tr>
-        <tr><th>Nivel</th><td>${esc(g.nivel)}</td></tr>
-        <tr><th>Estado</th><td>${badge(g.estado)}</td></tr>
+        <tr><th>Entrega estimada</th><td>${fecha(g.fecha_estimada)}</td></tr>
+        <tr><th>Servicio</th><td>${esc(NIVELES[g.nivel] || g.nivel)}</td></tr>
+        <tr><th>Etapa</th><td>${badge(g.estado)}</td></tr>
       </table>
       <div class="msg-cliente">${esc(g.mensaje)}</div>
-      <p><a href="#" id="btn-ir-guia">Consultar esta guía</a></p>`;
+      <p><a href="#" id="btn-ir-guia">Ver detalle y acciones de esta guía</a></p>`;
     $("#btn-ir-guia").onclick = (ev) => { ev.preventDefault(); abrirGuia(g.numero); };
     pintarResumen();
   } catch { /* el toast ya explica */ }
@@ -681,29 +728,38 @@ function pintarGuia() {
   $("#guia-contenido").style.display = "block";
   $("#g-numero").textContent = g.numero;
   $("#g-badge").innerHTML = badge(g.estado);
-  $("#g-fecha").textContent = fecha(g.fecha_estimada);
-  $("#g-nivel").textContent = g.nivel ?? "—";
-  $("#g-tarifa").textContent = dinero(g.tarifa);
-  $("#g-intentos").textContent = g.intentos_fallidos ?? "—";
-  $("#g-destino").textContent = g.destino ?? "—";
-  $("#g-garantia").textContent = g.con_garantia === undefined ? "—" : (g.con_garantia ? "Sí" : "No");
-  $("#g-cargos").textContent = dinero(g.cargos_adicionales);
-  $("#g-reembolso").textContent = g.reembolso || g.compensacion ? `${dinero(g.reembolso)} / ${dinero(g.compensacion)}` : "—";
+  // Solo se muestran los datos que se conocen (la consulta pública no trae tarifa, nivel ni montos)
+  const filas = [["Entrega estimada", fecha(g.fecha_estimada)]];
+  if (g.nivel) filas.push(["Servicio", NIVELES[g.nivel] || g.nivel]);
+  if (g.tarifa) filas.push(["Tarifa", dinero(g.tarifa)]);
+  if (g.destino) filas.push(["Dirección de entrega", g.destino]);
+  if (g.intentos_fallidos) filas.push(["Intentos de entrega fallidos", g.intentos_fallidos]);
+  if (g.con_garantia !== undefined) filas.push(["Garantía de fecha", g.con_garantia ? "Sí" : "No"]);
+  if (hayMonto(g.cargos_adicionales)) filas.push(["Cargos adicionales", dinero(g.cargos_adicionales)]);
+  if (hayMonto(g.reembolso)) filas.push(["Reembolso", dinero(g.reembolso)]);
+  if (hayMonto(g.compensacion)) filas.push(["Compensación", dinero(g.compensacion)]);
+  $("#g-detalle").innerHTML = filas.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("");
   $("#g-mensaje").textContent = g.mensaje;
 
   // Barra de progreso sobre la ruta normal
   const enRuta = RUTA.indexOf(g.estado);
   const avance = enRuta >= 0 ? enRuta : (g.estado === "EN_RESGUARDO" ? 4 : g.estado === "DEVUELTO" ? 4 : g.estado === "PERDIDO" ? 2 : 0);
-  $("#g-pasos").innerHTML = "Ruta: " + RUTA.map((e, i) =>
+  $("#g-pasos").innerHTML = "Avance: " + RUTA.map((e, i) =>
     `<span class="paso ${i <= avance ? "hecho" : ""} ${e === g.estado ? "actual" : ""}">${NOMBRES[e]}</span>`).join('<span class="sep">›</span>');
-  $("#g-aviso").textContent = RUTA.includes(g.estado) ? "" : `Estado fuera de la ruta normal: ${NOMBRES[g.estado]}.`;
+  const AVISOS = {
+    EN_RESGUARDO: "El paquete está guardado en el centro de distribución: se puede entregar ahí o programar una nueva visita.",
+    DEVUELTO: "El paquete se devolvió al remitente.",
+    CANCELADO: "Este envío fue cancelado.",
+    PERDIDO: "Este envío se declaró perdido.",
+  };
+  $("#g-aviso").textContent = AVISOS[g.estado] || "";
 
   // Operaciones válidas para el estado (tabla de la State Machine)
   const todas = $("#ver-todas").checked;
   $$(".op").forEach((op) => op.classList.toggle("oculta", !todas && !op.dataset.estados.split(",").includes(g.estado)));
   if (SIGUIENTE_ESCANEO[g.estado]) $("#op-escaneo [name=nuevo_estado]").value = SIGUIENTE_ESCANEO[g.estado];
   const sinOps = $$(".op").every((op) => op.classList.contains("oculta"));
-  $("#g-aviso").textContent += sinOps ? " Estado final: no admite más operaciones." : "";
+  $("#g-aviso").textContent += sinOps ? " No hay más acciones disponibles para este envío." : "";
 }
 
 $("#ver-todas").addEventListener("change", () => guiaActual && pintarGuia());
@@ -723,11 +779,12 @@ async function operar(metodo, ruta, cuerpo, exito) {
     toast(exito, g.mensaje);
   } catch { /* el toast ya explica */ }
 }
-const datosDe = (form) => Object.fromEntries(new FormData(form));
+// Los campos de archivo (firma, fotos) se envían como el nombre del archivo: la API guarda la referencia.
+const datosDe = (form) => Object.fromEntries([...new FormData(form)].map(([k, v]) => [k, v instanceof File ? v.name : v]));
 
 $("#op-escaneo").addEventListener("submit", (e) => {
   e.preventDefault();
-  operar("POST", "/escaneos", datosDe(e.target), "Escaneo registrado");
+  operar("POST", "/escaneos", datosDe(e.target), "Avance registrado");
 });
 $("#op-intento").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -738,9 +795,15 @@ $("#op-entrega").addEventListener("submit", (e) => {
   const d = datosDe(e.target);
   operar("POST", "/entrega", { ...d, es_tercero: !!d.es_tercero }, "Entrega registrada");
 });
-$("#op-reagendar").addEventListener("click", () => operar("POST", "/reagendamiento", null, "Visita reagendada"));
-$("#op-cancelar").addEventListener("click", () => operar("POST", "/cancelacion", null, "Guía cancelada"));
-$("#op-perdida").addEventListener("click", () => operar("POST", "/perdida", null, "Pérdida declarada"));
+$("#op-reagendar").addEventListener("click", () => operar("POST", "/reagendamiento", null, "Visita programada"));
+$("#op-cancelar").addEventListener("click", () => {
+  if (confirm(`¿Seguro que quieres cancelar el envío ${guiaActual}? Esta acción no se puede deshacer.`))
+    operar("POST", "/cancelacion", null, "Envío cancelado");
+});
+$("#op-perdida").addEventListener("click", () => {
+  if (confirm(`¿Declarar perdido el envío ${guiaActual}? Esta acción no se puede deshacer.`))
+    operar("POST", "/perdida", null, "Paquete declarado perdido");
+});
 $("#op-corregir").addEventListener("submit", (e) => {
   e.preventDefault();
   const d = datosDe(e.target);
@@ -759,7 +822,8 @@ $("#op-dano").addEventListener("submit", async (e) => {
   e.preventDefault();
   try {
     const inc = await api("POST", "/incidencias/danos", { numero_guia: guiaActual, foto: datosDe(e.target).foto });
-    toast("Folio abierto", `${inc.folio} · asignado a ${inc.asignada_a}`);
+    toast("Daño reportado", `Folio ${inc.folio} · lo atiende ${inc.asignada_a}`);
+    e.target.reset();
   } catch { /* el toast ya explica */ }
 });
 
@@ -771,10 +835,10 @@ $("#form-historial").addEventListener("submit", async (e) => {
     recordarGuia({ numero: h.numero, estado: h.estado, fecha_estimada: h.fecha_estimada, telefono_remitente: tel });
     pintarGuia();
     $("#historial").innerHTML = h.eventos.length ? `<table>
-      <thead><tr><th>Fecha y hora</th><th>Estado</th><th>Ubicación</th></tr></thead>
+      <thead><tr><th>Fecha y hora</th><th>Etapa</th><th>Lugar</th></tr></thead>
       <tbody>${[...h.eventos].reverse().map((ev) => `
         <tr><td>${fechaHora(ev.fecha_hora)}</td><td>${badge(ev.estado)}</td><td>${esc(ev.ubicacion)}</td></tr>`).join("")}</tbody></table>`
-      : `<p class="vacio">Sin eventos.</p>`;
+      : `<p class="vacio">Todavía no hay movimientos.</p>`;
   } catch { $("#historial").innerHTML = ""; }
 });
 
@@ -785,15 +849,15 @@ async function cargarIncidencias() {
   try { incidencias = await api("GET", "/incidencias"); } catch { incidencias = []; }
   $("#tabla-incidencias").innerHTML = incidencias.length ? incidencias.map((i) => `
     <tr>
-      <td class="mono">${esc(i.folio)}</td><td class="mono">${esc(i.numero_guia)}</td><td>${esc(i.tipo)}</td>
+      <td class="mono">${esc(i.folio)}</td><td class="mono">${esc(i.numero_guia)}</td><td>${esc(TIPOS_INCIDENCIA[i.tipo] || i.tipo)}</td>
       <td>${badge(i.estado)}</td><td>${esc(i.asignada_a)}</td>
       <td><div class="acciones">
-        ${i.tipo === "DANO" ? `<button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="REEMBOLSO">Reembolso</button>
-          <button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="REPOSICION">Reposición</button>` : ""}
-        <button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="ATENDIDA">Atendida</button>
+        ${i.tipo === "DANO" ? `<button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="REEMBOLSO">Reembolsar</button>
+          <button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="REPOSICION">Reponer paquete</button>`
+        : `<button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="ATENDIDA">Marcar como atendida</button>`}
       </div></td>
     </tr>`).join("")
-    : `<tr><td colspan="6" class="vacio">Sin incidencias pendientes. Ejecuta el monitoreo con una fecha simulada para generar alertas.</td></tr>`;
+    : `<tr><td colspan="6" class="vacio">No hay incidencias por atender.<span class="tec"> Ejecuta el monitoreo con una fecha simulada para generar alertas.</span></td></tr>`;
   pintarResumen();
 }
 $("#btn-incidencias").addEventListener("click", cargarIncidencias);
@@ -802,7 +866,7 @@ $("#tabla-incidencias").addEventListener("click", async (e) => {
   if (!b) return;
   try {
     const r = await api("POST", `/incidencias/${encodeURIComponent(b.dataset.folio)}/resolucion`, { resolucion: b.dataset.res });
-    toast("Incidencia resuelta", `${r.folio} · ${r.resolucion}`);
+    toast("Incidencia resuelta", `${r.folio} · ${RESOLUCIONES[r.resolucion] || r.resolucion}`);
     cargarIncidencias();
   } catch { /* el toast ya explica */ }
 });
@@ -811,7 +875,7 @@ $("#form-dano").addEventListener("submit", async (e) => {
   const d = datosDe(e.target);
   try {
     const inc = await api("POST", "/incidencias/danos", { numero_guia: d.numero_guia.trim().toUpperCase(), foto: d.foto });
-    toast("Folio abierto", `${inc.folio} · asignado a ${inc.asignada_a}`);
+    toast("Daño reportado", `Folio ${inc.folio} · lo atiende ${inc.asignada_a}`);
     e.target.reset();
     cargarIncidencias();
   } catch { /* el toast ya explica */ }
@@ -832,14 +896,14 @@ $("#form-monitoreo").addEventListener("submit", async (e) => {
   const qs = valor ? `?ahora=${encodeURIComponent(new Date(valor).toISOString())}` : "";
   try {
     const r = await api("POST", `/monitoreo/ejecutar${qs}`);
-    const bloque = (titulo, lista, color) => `
+    const bloque = (titulo, lista) => `
       <div style="margin-bottom:10px"><b>${titulo} (${lista.length})</b>
         <div class="chips" style="margin-top:6px">${lista.length ? lista.map((x) => `<span class="chip mono">${esc(x)}</span>`).join("") : `<span class="nota">Ninguna</span>`}</div></div>`;
     $("#monitoreo-resultado").innerHTML = `
       <p class="nota" style="margin:0 0 12px">Ejecutado en: ${fechaHora(r.ejecutado_en)}</p>
-      ${bloque("Alertas generadas", r.alertas_generadas, "var(--warn)")}
-      ${bloque("Alertas escaladas", r.alertas_escaladas, "var(--bad)")}
-      ${bloque("Guías devueltas", r.guias_devueltas, "var(--gray)")}`;
+      ${bloque("Alertas generadas", r.alertas_generadas)}
+      ${bloque("Alertas escaladas", r.alertas_escaladas)}
+      ${bloque("Guías devueltas", r.guias_devueltas)}`;
     toast("Monitoreo ejecutado", `${r.alertas_generadas.length} alertas, ${r.alertas_escaladas.length} escaladas, ${r.guias_devueltas.length} devueltas`);
     actualizarResumen();
   } catch { /* el toast ya explica */ }
