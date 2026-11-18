@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "CargoBox API",
-    "description": "\nAPI de **CargoBox — Plataforma de Envíos Nacionales** (Caso 14, PIA Componentes de Lógica de Negocios).\n\nImplementa las 15 historias de usuario del BRD con DDD, Specification y State Machine.\nCada endpoint indica su historia (US) en el título. Los errores de negocio responden con\n`{\"error\": \"...\", \"mensaje\": \"...\"}` en lenguaje entendible para el cliente.\n",
+    "description": "\nAPI de **CargoBox — Plataforma de Envíos Nacionales** (Caso 14, PIA Componentes de Lógica de Negocios).\n\nImplementa las 15 historias de usuario del BRD con DDD, Specification y State Machine.\nCada endpoint indica su historia (US) en el título. Los errores de negocio responden con\n`{\"error\": \"...\", \"mensaje\": \"...\"}` en lenguaje entendible para el cliente.\n\nEl panel de operaciones (dashboard en HTML) está en [`/panel`](/panel).\n",
     "version": "1.0.0"
   },
   "paths": {

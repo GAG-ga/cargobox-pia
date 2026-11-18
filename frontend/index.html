@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CargoBox · Sistema de envíos</title>
+<style>
+  body { margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #222; background: #eceff2; }
+  a { color: #1a5aa6; }
+
+  /* Encabezado y menú */
+  .encabezado { background: #1f3d63; color: #fff; }
+  .encabezado .interior { max-width: 1180px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; height: 46px; }
+  .encabezado h1 { font-size: 17px; margin: 0; font-weight: bold; letter-spacing: .5px; }
+  .encabezado h1 span { font-weight: normal; color: #b9c8db; font-size: 13px; margin-left: 8px; }
+  .conexion { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #d6e0ec; }
+  .conexion input { width: 210px; padding: 3px 6px; border: 1px solid #47678f; background: #fff; color: #222; font-size: 12px; border-radius: 0; }
+  .punto { display: inline-block; width: 9px; height: 9px; background: #999; }
+  .punto.ok { background: #4fc26a; } .punto.bad { background: #e05252; }
+  nav { background: #fff; border-bottom: 1px solid #c8cdd3; }
+  nav .interior { max-width: 1180px; margin: 0 auto; padding: 0 16px; display: flex; }
+  nav button { font: inherit; background: none; border: 0; border-bottom: 3px solid transparent; padding: 11px 16px 9px;
+               cursor: pointer; color: #333; }
+  nav button:hover { background: #f3f5f7; }
+  nav button.activo { border-bottom-color: #1f3d63; font-weight: bold; color: #1f3d63; }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 18px 16px 50px; }
+  .vista { display: none; } .vista.activa { display: block; }
+  .titulo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .titulo h2 { font-size: 18px; margin: 0; font-weight: normal; }
+  .titulo p { margin: 3px 0 0; color: #666; font-size: 12px; }
+
+  /* Paneles */
+  .card { background: #fff; border: 1px solid #c8cdd3; margin-bottom: 14px; }
+  .card > h2, .card h2 { margin: 0; padding: 7px 12px; font-size: 13px; background: #f4f6f8; border-bottom: 1px solid #d8dce1;
+              display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+  .card h2 small { font-weight: normal; color: #777; }
+  .cuerpo { padding: 12px; }
+  .grid { display: grid; gap: 14px; align-items: start; }
+  .g2 { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+  .g-side { grid-template-columns: minmax(0,1.6fr) minmax(0,1fr); }
+
+  /* Totales */
+  .kpis { display: grid; grid-template-columns: repeat(5, 1fr); background: #fff; border: 1px solid #c8cdd3; margin-bottom: 14px; }
+  .kpi { padding: 10px 14px; border-right: 1px solid #e1e4e8; }
+  .kpi:last-child { border-right: 0; }
+  .kpi span { color: #666; font-size: 12px; }
+  .kpi b { display: block; font-size: 22px; margin-top: 2px; font-weight: normal; color: #1f3d63; }
+
+  /* Tablas */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 12px; background: #fafbfc; color: #444; padding: 6px 10px; border-bottom: 1px solid #d8dce1; }
+  td { padding: 6px 10px; border-bottom: 1px solid #eceef1; }
+  tbody tr:nth-child(even) td { background: #fbfbfc; }
+  tr.clic { cursor: pointer; } tr.clic:hover td { background: #eef4fb; }
+  .mono { font-family: Consolas, "Courier New", monospace; white-space: nowrap; }
+  .vacio { color: #777; text-align: center; padding: 18px; font-style: italic; }
+  .gris { color: #666; font-size: 12px; }
+
+  /* Estado: texto con un cuadrito de color */
+  .badge { white-space: nowrap; }
+  .badge::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: 0; background: #999; }
+  .b-CLASIFICADO::before, .b-EN_TRANSITO::before, .b-CENTRO_DESTINO::before { background: #2d6cc0; }
+  .b-EN_REPARTO::before { background: #d39b0a; }
+  .b-ENTREGADO::before, .b-RESUELTA::before { background: #2e9a4f; }
+  .b-EN_RESGUARDO::before, .b-ABIERTA::before { background: #e07b1f; }
+  .b-DEVUELTO::before, .b-CANCELADO::before { background: #aaa; }
+  .b-PERDIDO::before, .b-ESCALADA::before { background: #cc3333; }
+
+  /* Conteo por estado */
+  .barra { display: grid; grid-template-columns: 110px 1fr 24px; align-items: center; gap: 8px; padding: 3px 0; }
+  .barra .pista { background: #eef0f2; height: 8px; }
+  .barra .relleno { height: 100%; }
+  .barra em { font-style: normal; text-align: right; }
+
+  /* Formularios */
+  .fila { display: grid; gap: 10px; margin-bottom: 9px; }
+  .f2 { grid-template-columns: repeat(2, minmax(0,1fr)); } .f3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .f4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .fila > * { min-width: 0; }
+  label.campo { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #444; }
+  input, select { font: inherit; padding: 5px 7px; border: 1px solid #b9bfc7; background: #fff; color: #222; border-radius: 2px; }
+  input:focus, select:focus { outline: none; border-color: #2d6cc0; box-shadow: 0 0 0 1px #2d6cc0; }
+  fieldset { border: 1px solid #d8dce1; padding: 8px 10px 2px; margin: 0 0 10px; }
+  legend { font-weight: bold; font-size: 12px; padding: 0 4px; }
+  .check { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: normal; }
+  .btn { font: inherit; border: 1px solid #1d4f8f; background: #2a62a8; color: #fff; padding: 5px 14px; cursor: pointer; border-radius: 2px; }
+  .btn:hover { background: #22558f; }
+  .btn.sec { background: #f4f5f7; color: #222; border-color: #b9bfc7; }
+  .btn.sec:hover { background: #e8eaed; }
+  .btn.peligro { background: #b83232; border-color: #962626; }
+  .btn.chico { padding: 3px 10px; font-size: 12px; }
+  .acciones { display: flex; gap: 6px; flex-wrap: wrap; }
+  .buscador { display: flex; gap: 6px; }
+  .buscador input { flex: 1; min-width: 0; }
+  .buscador .btn { white-space: nowrap; }
+
+  /* Ficha de la guía */
+  .det { width: 100%; border-collapse: collapse; }
+  .det th { width: 22%; background: #f7f8fa; font-weight: normal; color: #555; border: 1px solid #e1e4e8; }
+  .det td { border: 1px solid #e1e4e8; background: #fff !important; }
+  .msg-cliente { margin-top: 10px; padding: 8px 10px; background: #fffbe6; border: 1px solid #eadf9f; }
+  .pasos { margin: 0 0 10px; color: #888; }
+  .pasos .paso.hecho { color: #333; }
+  .pasos .paso.actual { color: #1f3d63; font-weight: bold; text-decoration: underline; }
+  .pasos .sep { margin: 0 6px; color: #bbb; }
+  .aviso-final { color: #a0521c; font-size: 12px; margin-bottom: 8px; }
+  .op { border-top: 1px solid #e1e4e8; padding: 10px 0 8px; }
+  .op:first-of-type { border-top: 0; padding-top: 0; }
+  .op h3 { margin: 0 0 2px; font-size: 13px; }
+  .op h3 .us { font-weight: normal; color: #888; font-size: 11px; margin-left: 6px; }
+  .op p { margin: 0 0 7px; color: #666; font-size: 12px; }
+  .op.oculta { display: none; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid #d8dce1; background: #f7f8fa; padding: 1px 6px; font-size: 12px; }
+  .nota { color: #777; font-size: 12px; margin: 6px 0 0; }
+  .resultado { margin-top: 10px; }
+
+  /* Mensajes */
+  #toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 50; }
+  .toast { background: #eaf6ec; border: 1px solid #9ccfa8; color: #1e5a2c; padding: 8px 12px; max-width: 360px; font-size: 12px; }
+  .toast.error { background: #fbeaea; border-color: #e3a5a5; color: #7d1f1f; }
+  .toast b { display: block; }
+
+  footer { text-align: center; color: #888; font-size: 11px; padding: 10px; }
+
+  @media (max-width: 900px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .g2, .g-side, .f3, .f4 { grid-template-columns: 1fr; }
+    nav .interior { overflow-x: auto; } .conexion input { width: 140px; }
+  }
+</style>
+</head>
+<body>
+<div class="encabezado">
+  <div class="interior">
+    <h1>CargoBox <span>Sistema de envíos nacionales</span></h1>
+    <div class="conexion">
+      <span class="punto" id="salud-punto"></span><span id="salud-texto">Sin verificar</span>
+      <label for="api-url">Servidor:</label><input id="api-url" spellcheck="false">
+    </div>
+  </div>
+</div>
+<nav>
+  <div class="interior">
+    <button data-vista="resumen" class="activo">Inicio</button>
+    <button data-vista="registrar">Nueva guía</button>
+    <button data-vista="guia">Consultar / operar guía</button>
+    <button data-vista="incidencias">Incidencias</button>
+    <button data-vista="monitoreo">Monitoreo</button>
+  </div>
+</nav>
+
+<main>
+  <!-- ============================ INICIO ============================ -->
+  <section class="vista activa" id="v-resumen">
+    <div class="titulo">
+      <div><h2>Inicio</h2><p>Guías en seguimiento e incidencias pendientes.</p></div>
+      <div class="acciones">
+        <button class="btn sec" id="btn-demo">Cargar guías de demo</button>
+        <button class="btn" id="btn-actualizar">Actualizar</button>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span>Guías en seguimiento</span><b id="k-total">0</b></div>
+      <div class="kpi"><span>En camino</span><b id="k-camino">0</b></div>
+      <div class="kpi"><span>Entregadas</span><b id="k-entregadas">0</b></div>
+      <div class="kpi"><span>En resguardo</span><b id="k-resguardo">0</b></div>
+      <div class="kpi"><span>Incidencias pendientes</span><b id="k-incidencias">0</b></div>
+    </div>
+    <div class="grid g-side">
+      <div class="card">
+        <h2>Guías <small>Haz clic en una guía para consultarla</small></h2>
+        <table>
+          <thead><tr><th>Número</th><th>Estado</th><th>Fecha estimada</th><th>Mensaje al cliente</th><th></th></tr></thead>
+          <tbody id="tabla-guias"></tbody>
+        </table>
+        <div class="cuerpo">
+          <form class="buscador" id="form-seguir">
+            <input id="seguir-numero" placeholder="Agregar guía por número (ej. CBX-000006)" required>
+            <button class="btn sec">Agregar</button>
+          </form>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h2>Guías por estado</h2>
+          <div class="cuerpo" id="barras"></div>
+        </div>
+        <div class="card">
+          <h2>Incidencias pendientes <small>US12 / US13</small></h2>
+          <div id="resumen-incidencias"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ NUEVA GUÍA ============================ -->
+  <section class="vista" id="v-registrar">
+    <div class="titulo"><div><h2>Nueva guía</h2><p>US01 · Registro del envío y cotización (RN-01 peso y medidas, RN-03 tarifa).</p></div></div>
+    <div class="grid g-side">
+      <form class="card" id="form-registrar">
+        <h2>Datos del envío</h2>
+        <div class="cuerpo">
+          <fieldset><legend>Remitente</legend>
+            <div class="fila f2">
+              <label class="campo">Nombre<input name="rem_nombre" value="Carlos Ruiz" required></label>
+              <label class="campo">Teléfono (10 dígitos)<input name="rem_tel" value="8112345678" required></label>
+            </div>
+          </fieldset>
+          <fieldset><legend>Destinatario</legend>
+            <div class="fila f2">
+              <label class="campo">Nombre<input name="des_nombre" value="Ana López" required></label>
+              <label class="campo">Teléfono (10 dígitos)<input name="des_tel" value="8187654321" required></label>
+            </div>
+          </fieldset>
+          <fieldset><legend>Direcciones</legend>
+            <div class="fila f2">
+              <label class="campo">Calle de origen<input name="ori_calle" value="Av. Universidad 100" required></label>
+              <label class="campo">C.P. origen<input name="ori_cp" value="66450" required></label>
+            </div>
+            <div class="fila f2">
+              <label class="campo">Calle de destino<input name="des_calle" value="Calle Roble 10" required></label>
+              <label class="campo">C.P. destino<input name="des_cp" value="66220" required></label>
+            </div>
+          </fieldset>
+          <fieldset><legend>Paquete</legend>
+            <div class="fila f4">
+              <label class="campo">Peso (kg)<input name="peso" type="number" step="0.1" value="10" required></label>
+              <label class="campo">Largo (cm)<input name="largo" type="number" step="0.1" value="40" required></label>
+              <label class="campo">Ancho (cm)<input name="ancho" type="number" step="0.1" value="30" required></label>
+              <label class="campo">Alto (cm)<input name="alto" type="number" step="0.1" value="20" required></label>
+            </div>
+          </fieldset>
+          <div class="fila f3">
+            <label class="campo">Nivel de servicio
+              <select name="nivel"><option value="ESTANDAR">Estándar</option><option value="EXPRESS">Express</option></select>
+            </label>
+            <label class="campo">Valor declarado ($)<input name="valor" type="number" step="0.01" value="1200" required></label>
+            <label class="campo">Sucursal<input name="sucursal" value="Sucursal San Nicolás" required></label>
+          </div>
+          <button class="btn">Registrar guía</button>
+        </div>
+      </form>
+      <div class="card">
+        <h2>Guía generada</h2>
+        <div class="cuerpo">
+          <div id="registro-resultado"><p class="vacio">Todavía no se ha registrado ninguna guía.</p></div>
+          <p class="nota">Para probar la regla RN-01, registra un paquete de 31 kg: la API lo rechaza como carga especial.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CONSULTAR / OPERAR ============================ -->
+  <section class="vista" id="v-guia">
+    <div class="titulo"><div><h2>Consultar / operar guía</h2><p>Estado (US08), historial del remitente (US09) y operaciones del ciclo de vida.</p></div></div>
+    <div class="card"><div class="cuerpo">
+      <form class="buscador" id="form-buscar">
+        <input id="buscar-numero" placeholder="Número de guía (ej. CBX-000001)" required>
+        <button class="btn">Buscar</button>
+      </form>
+    </div></div>
+
+    <div id="guia-contenido" style="display:none">
+      <div class="card">
+        <h2><span>Guía <span class="mono" id="g-numero"></span> — <span id="g-badge"></span></span>
+            <button class="btn sec chico" id="btn-recargar">Recargar</button></h2>
+        <div class="cuerpo">
+          <div class="pasos" id="g-pasos"></div>
+          <div class="aviso-final" id="g-aviso"></div>
+          <table class="det">
+            <tr><th>Fecha estimada</th><td id="g-fecha">—</td><th>Nivel</th><td id="g-nivel">—</td></tr>
+            <tr><th>Tarifa</th><td id="g-tarifa">—</td><th>Intentos fallidos</th><td id="g-intentos">—</td></tr>
+            <tr><th>Destino</th><td id="g-destino">—</td><th>Con garantía</th><td id="g-garantia">—</td></tr>
+            <tr><th>Cargos adicionales</th><td id="g-cargos">—</td><th>Reembolso / compensación</th><td id="g-reembolso">—</td></tr>
+          </table>
+          <div class="msg-cliente"><b>Mensaje al cliente:</b> <span id="g-mensaje"></span></div>
+          <p class="nota">Nivel, tarifa y montos aparecen después de registrar u operar la guía desde aquí; la consulta pública (US08) solo devuelve estado, fecha y mensaje.</p>
+        </div>
+      </div>
+
+      <div class="grid g2">
+        <div class="card">
+          <h2>Operaciones <label class="check"><input type="checkbox" id="ver-todas"> Mostrar todas</label></h2>
+          <div class="cuerpo">
+            <p class="nota" style="margin:0 0 10px">Solo se muestran las operaciones permitidas para el estado actual. Con “Mostrar todas” puedes probar cómo la API rechaza las demás.</p>
+
+            <div class="op" data-estados="RECIBIDO,CLASIFICADO,EN_TRANSITO,CENTRO_DESTINO">
+              <h3>Registrar escaneo <span class="us">US04</span></h3>
+              <p>Mueve la guía al siguiente punto de su ruta.</p>
+              <form id="op-escaneo" class="fila f3">
+                <select name="nuevo_estado">
+                  <option>CLASIFICADO</option><option>EN_TRANSITO</option><option>CENTRO_DESTINO</option><option>EN_REPARTO</option>
+                </select>
+                <input name="ubicacion" value="CEDIS Monterrey" required>
+                <div><button class="btn chico">Registrar</button></div>
+              </form>
+            </div>
+
+            <div class="op" data-estados="EN_REPARTO">
+              <h3>Intento de entrega fallido <span class="us">US05</span></h3>
+              <p>Al segundo intento la guía pasa a resguardo (RN-06).</p>
+              <form id="op-intento" class="fila f3">
+                <input name="motivo" value="Destinatario ausente" required>
+                <input name="ubicacion" value="Domicilio del destinatario">
+                <div><button class="btn chico">Registrar</button></div>
+              </form>
+            </div>
+
+            <div class="op" data-estados="EN_REPARTO,EN_RESGUARDO">
+              <h3>Entrega con evidencia <span class="us">US06 / US07 / US10</span></h3>
+              <p>Firma y foto obligatorias (RN-07). Marca “tercero” si recibe un vecino o portero.</p>
+              <form id="op-entrega">
+                <div class="fila f3">
+                  <input name="nombre_receptor" value="Ana López" placeholder="Quién recibe" required>
+                  <input name="firma_digital" value="firma-ana.png" placeholder="Firma">
+                  <input name="foto" value="foto-paquete.jpg" placeholder="Foto">
+                </div>
+                <div class="fila f2">
+                  <input name="ubicacion" value="Domicilio del destinatario">
+                  <label class="check"><input type="checkbox" name="es_tercero"> Recibe un tercero</label>
+                </div>
+                <button class="btn chico">Registrar entrega</button>
+              </form>
+            </div>
+
+            <div class="op" data-estados="EN_RESGUARDO">
+              <h3>Reagendar visita <span class="us">US10</span></h3>
+              <p>Solo una vez y dentro de los 5 días hábiles de resguardo (RN-13).</p>
+              <button class="btn chico" id="op-reagendar">Reagendar</button>
+            </div>
+
+            <div class="op" data-estados="RECIBIDO">
+              <h3>Corregir datos <span class="us">US03</span></h3>
+              <p>Solo antes de clasificar (RN-10). Deja en blanco lo que no cambia.</p>
+              <form id="op-corregir">
+                <div class="fila f2"><input name="ori_calle" placeholder="Calle de origen"><input name="ori_cp" placeholder="C.P. origen"></div>
+                <div class="fila f2"><input name="des_calle" placeholder="Calle de destino"><input name="des_cp" placeholder="C.P. destino"></div>
+                <button class="btn chico">Guardar</button>
+              </form>
+            </div>
+
+            <div class="op" data-estados="CLASIFICADO,EN_TRANSITO,CENTRO_DESTINO">
+              <h3>Cambio de dirección <span class="us">US11</span></h3>
+              <p>Cargo de $80; la guía pierde la garantía. Requiere validar identidad (RN-14).</p>
+              <form id="op-direccion">
+                <div class="fila f2"><input name="calle" placeholder="Nueva calle" required><input name="cp" placeholder="C.P." required></div>
+                <div class="fila f2">
+                  <label class="check"><input type="checkbox" name="identidad" checked> Identidad validada</label>
+                  <div><button class="btn chico">Cambiar dirección</button></div>
+                </div>
+              </form>
+            </div>
+
+            <div class="op" data-estados="RECIBIDO">
+              <h3>Cancelar guía <span class="us">US02</span></h3>
+              <p>Solo antes de que se clasifique (RN-09).</p>
+              <button class="btn peligro chico" id="op-cancelar">Cancelar guía</button>
+            </div>
+
+            <div class="op" data-estados="EN_TRANSITO,CENTRO_DESTINO,EN_REPARTO">
+              <h3>Declarar pérdida <span class="us">US15</span></h3>
+              <p>Calcula la compensación según el valor declarado (RN-18).</p>
+              <button class="btn peligro chico" id="op-perdida">Declarar pérdida</button>
+            </div>
+
+            <div class="op" data-estados="ENTREGADO">
+              <h3>Reportar paquete dañado <span class="us">US14</span></h3>
+              <p>Abre un folio con evidencia fotográfica (RN-17).</p>
+              <form id="op-dano" class="fila f3">
+                <input name="foto" value="dano.jpg" placeholder="Foto del daño">
+                <div><button class="btn chico">Abrir folio</button></div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Historial del remitente <small>US09</small></h2>
+          <div class="cuerpo">
+            <form class="buscador" id="form-historial">
+              <input id="historial-tel" placeholder="Teléfono del remitente" value="8112345678" required>
+              <button class="btn sec">Ver historial</button>
+            </form>
+            <p class="nota">Con un teléfono distinto la API responde AccesoDenegado (RN-08).</p>
+            <div class="resultado" id="historial"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ INCIDENCIAS ============================ -->
+  <section class="vista" id="v-incidencias">
+    <div class="titulo">
+      <div><h2>Incidencias</h2><p>Alertas por retraso (US12), escalamiento (US13) y folios por daño (US14).</p></div>
+      <button class="btn" id="btn-incidencias">Actualizar</button>
+    </div>
+    <div class="grid g-side">
+      <div class="card">
+        <h2>Pendientes <small>abiertas y escaladas</small></h2>
+        <table>
+          <thead><tr><th>Folio</th><th>Guía</th><th>Tipo</th><th>Estado</th><th>Asignada a</th><th>Resolver</th></tr></thead>
+          <tbody id="tabla-incidencias"></tbody>
+        </table>
+      </div>
+      <form class="card" id="form-dano">
+        <h2>Abrir folio por daño <small>US14</small></h2>
+        <div class="cuerpo">
+          <div class="fila"><label class="campo">Número de guía<input name="numero_guia" placeholder="CBX-000001" required></label></div>
+          <div class="fila"><label class="campo">Foto (obligatoria)<input name="foto" value="dano.jpg"></label></div>
+          <button class="btn">Abrir folio</button>
+          <p class="nota">Se asigna al supervisor de la sucursal de origen.</p>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============================ MONITOREO ============================ -->
+  <section class="vista" id="v-monitoreo">
+    <div class="titulo"><div><h2>Monitoreo de reglas de tiempo</h2><p>US10 / US12 / US13 · Genera alertas, escala las que siguen abiertas y devuelve resguardos vencidos.</p></div></div>
+    <div class="grid g-side">
+      <form class="card" id="form-monitoreo">
+        <h2>Ejecutar</h2>
+        <div class="cuerpo">
+          <div class="fila f2">
+            <label class="campo">Fecha simulada (en blanco = ahora)<input type="datetime-local" name="ahora" id="mon-fecha"></label>
+            <label class="campo">Atajos
+              <div class="acciones"><button type="button" class="btn sec chico" data-dias="2">+2 días</button>
+                <button type="button" class="btn sec chico" data-dias="4">+4 días</button>
+                <button type="button" class="btn sec chico" data-dias="10">+10 días</button></div>
+            </label>
+          </div>
+          <button class="btn">Ejecutar monitoreo</button>
+          <p class="nota">Para la demo: +2 días genera alertas, +4 días las escala y +10 días devuelve los resguardos vencidos.</p>
+        </div>
+      </form>
+      <div class="card">
+        <h2>Resultado</h2>
+        <div class="cuerpo" id="monitoreo-resultado"><p class="vacio">Aún no se ha ejecutado.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>CargoBox · PIA Componentes de Lógica de Negocios · FIME UANL</footer>
+<div id="toasts"></div>
+
+<script>
+/* ========================================================================
+   Configuración y utilidades
+   ======================================================================== */
+const ESTADOS = ["RECIBIDO", "CLASIFICADO", "EN_TRANSITO", "CENTRO_DESTINO", "EN_REPARTO", "ENTREGADO",
+                 "EN_RESGUARDO", "DEVUELTO", "CANCELADO", "PERDIDO"];
+const RUTA = ["RECIBIDO", "CLASIFICADO", "EN_TRANSITO", "CENTRO_DESTINO", "EN_REPARTO", "ENTREGADO"];
+const SIGUIENTE_ESCANEO = { RECIBIDO: "CLASIFICADO", CLASIFICADO: "EN_TRANSITO",
+                            EN_TRANSITO: "CENTRO_DESTINO", CENTRO_DESTINO: "EN_REPARTO" };
+const COLORES = { RECIBIDO: "#8a90a0", CLASIFICADO: "#6f9be8", EN_TRANSITO: "#2f6fd6", CENTRO_DESTINO: "#1f4fa8",
+                  EN_REPARTO: "#d98a00", ENTREGADO: "#1f9d6b", EN_RESGUARDO: "#f26b1d", DEVUELTO: "#9aa0ad",
+                  CANCELADO: "#b8bcc6", PERDIDO: "#d23c3c" };
+const NOMBRES = { RECIBIDO: "Recibido", CLASIFICADO: "Clasificado", EN_TRANSITO: "En tránsito",
+                  CENTRO_DESTINO: "Centro destino", EN_REPARTO: "En reparto", ENTREGADO: "Entregado",
+                  EN_RESGUARDO: "En resguardo", DEVUELTO: "Devuelto", CANCELADO: "Cancelado", PERDIDO: "Perdido" };
+const DEMO = ["CBX-000001", "CBX-000002", "CBX-000003", "CBX-000004", "CBX-000005"];
+
+const $ = (sel, raiz = document) => raiz.querySelector(sel);
+const $$ = (sel, raiz = document) => [...raiz.querySelectorAll(sel)];
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const badge = (estado) => `<span class="badge b-${esc(estado)}">${esc(NOMBRES[estado] || estado)}</span>`;
+const fecha = (iso) => iso ? new Date(iso + (iso.length === 10 ? "T12:00:00" : "")).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+const dinero = (v) => v === undefined || v === null || v === "" ? "—" : (String(v).startsWith("$") ? v : "$" + v);
+const fechaHora = (iso) => new Date(iso).toLocaleString("es-MX", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+
+function leer(clave, defecto) {
+  try { return JSON.parse(localStorage.getItem(clave)) ?? defecto; } catch { return defecto; }
+}
+function guardar(clave, valor) {
+  try { localStorage.setItem(clave, JSON.stringify(valor)); } catch { /* sin almacenamiento */ }
+}
+
+// Si el panel se sirve desde FastAPI (/panel) usa el mismo servidor; si se abre como archivo, localhost.
+const urlPorDefecto = location.protocol.startsWith("http") ? location.origin : "http://localhost:8000";
+let API = leer("cbx_api", urlPorDefecto);
+// Guías que sigue el panel: { "CBX-000001": { estado, fecha_estimada, mensaje, ...datos de GuiaOut } }
+let guias = leer("cbx_guias", {});
+let guiaActual = null;
+let incidencias = [];
+
+function toast(titulo, texto = "", error = false) {
+  const t = document.createElement("div");
+  t.className = "toast" + (error ? " error" : "");
+  t.innerHTML = `<b>${esc(titulo)}</b>${esc(texto)}`;
+  $("#toasts").appendChild(t);
+  setTimeout(() => t.remove(), error ? 7000 : 4000);
+}
+
+/* Llama a la API. Los errores de negocio llegan como {"error": "...", "mensaje": "..."}. */
+async function api(metodo, ruta, cuerpo) {
+  let resp;
+  try {
+    resp = await fetch(API.replace(/\/$/, "") + ruta, {
+      method: metodo,
+      headers: cuerpo ? { "Content-Type": "application/json" } : {},
+      body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+    });
+  } catch {
+    toast("No hay conexión con la API", `Revisa que esté corriendo en ${API}`, true);
+    throw new Error("sin-conexion");
+  }
+  const datos = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    toast(datos.error || `Error ${resp.status}`, datos.mensaje || "La operación no se pudo completar.", true);
+    throw Object.assign(new Error(datos.error), { estado: resp.status, datos });
+  }
+  return datos;
+}
+
+function recordarGuia(datos) {
+  guias[datos.numero] = { ...(guias[datos.numero] || {}), ...datos };
+  guardar("cbx_guias", guias);
+}
+
+/* ========================================================================
+   Navegación y salud de la API
+   ======================================================================== */
+function irA(vista) {
+  $$("nav button").forEach((b) => b.classList.toggle("activo", b.dataset.vista === vista));
+  $$(".vista").forEach((v) => v.classList.toggle("activa", v.id === "v-" + vista));
+  if (vista === "incidencias") cargarIncidencias();
+}
+$$("nav button").forEach((b) => b.addEventListener("click", () => irA(b.dataset.vista)));
+
+async function verificarSalud() {
+  const punto = $("#salud-punto"), texto = $("#salud-texto");
+  try {
+    const r = await fetch(API.replace(/\/$/, "") + "/salud");
+    const d = await r.json();
+    punto.className = "punto ok";
+    texto.textContent = `API activa · ${d.entorno}`;
+  } catch {
+    punto.className = "punto bad";
+    texto.textContent = "API sin conexión";
+  }
+}
+$("#api-url").value = API;
+$("#api-url").addEventListener("change", (e) => {
+  API = e.target.value.trim() || urlPorDefecto;
+  guardar("cbx_api", API);
+  verificarSalud();
+  actualizarResumen();
+});
+
+/* ========================================================================
+   Resumen
+   ======================================================================== */
+async function actualizarResumen() {
+  const numeros = Object.keys(guias);
+  await Promise.all(numeros.map(async (n) => {
+    try {
+      const r = await fetch(`${API.replace(/\/$/, "")}/rastreo/${encodeURIComponent(n)}`);
+      if (r.ok) recordarGuia(await r.json());
+    } catch { /* se muestra lo último conocido */ }
+  }));
+  try { incidencias = await (await fetch(API.replace(/\/$/, "") + "/incidencias")).json(); } catch { /* sin conexión */ }
+  pintarResumen();
+}
+
+function pintarResumen() {
+  const lista = Object.values(guias).sort((a, b) => a.numero.localeCompare(b.numero));
+  const cuenta = (...es) => lista.filter((g) => es.includes(g.estado)).length;
+  $("#k-total").textContent = lista.length;
+  $("#k-camino").textContent = cuenta("CLASIFICADO", "EN_TRANSITO", "CENTRO_DESTINO", "EN_REPARTO");
+  $("#k-entregadas").textContent = cuenta("ENTREGADO");
+  $("#k-resguardo").textContent = cuenta("EN_RESGUARDO");
+  $("#k-incidencias").textContent = Array.isArray(incidencias) ? incidencias.length : 0;
+
+  $("#tabla-guias").innerHTML = lista.length ? lista.map((g) => `
+    <tr class="clic" data-numero="${esc(g.numero)}">
+      <td class="mono">${esc(g.numero)}</td><td>${badge(g.estado)}</td><td>${fecha(g.fecha_estimada)}</td>
+      <td class="gris">${esc(g.mensaje)}</td>
+      <td><button class="btn sec chico" data-quitar="${esc(g.numero)}" title="Quitar de la lista">Quitar</button></td>
+    </tr>`).join("")
+    : `<tr><td colspan="5" class="vacio">No hay guías en seguimiento. Registra una o usa “Cargar guías de demo”.</td></tr>`;
+
+  const max = Math.max(1, ...ESTADOS.map((e) => cuenta(e)));
+  $("#barras").innerHTML = ESTADOS.map((e) => `
+    <div class="barra"><span>${NOMBRES[e]}</span>
+      <div class="pista"><div class="relleno" style="width:${(cuenta(e) / max) * 100}%;background:${COLORES[e]}"></div></div>
+      <em>${cuenta(e)}</em></div>`).join("");
+
+  const inc = Array.isArray(incidencias) ? incidencias : [];
+  $("#resumen-incidencias").innerHTML = inc.length ? `<table><tbody>${inc.slice(0, 6).map((i) => `
+      <tr><td class="mono">${esc(i.folio)}</td><td>${esc(i.tipo)}</td><td>${badge(i.estado)}</td><td class="mono">${esc(i.numero_guia)}</td></tr>`).join("")}
+    </tbody></table>${inc.length > 6 ? `<p class="nota">y ${inc.length - 6} más…</p>` : ""}`
+    : `<p class="vacio">No hay incidencias pendientes.</p>`;
+}
+
+$("#tabla-guias").addEventListener("click", (e) => {
+  const quitar = e.target.closest("[data-quitar]");
+  if (quitar) {
+    delete guias[quitar.dataset.quitar];
+    guardar("cbx_guias", guias);
+    return pintarResumen();
+  }
+  const fila = e.target.closest("tr[data-numero]");
+  if (fila) abrirGuia(fila.dataset.numero);
+});
+$("#btn-actualizar").addEventListener("click", actualizarResumen);
+$("#btn-demo").addEventListener("click", async () => {
+  DEMO.forEach((n) => { if (!guias[n]) guias[n] = { numero: n, estado: "RECIBIDO" }; });
+  await actualizarResumen();
+  // Quita las que no existen en esta base (por ejemplo, si no se cargó la demo)
+  for (const n of DEMO) {
+    const r = await fetch(`${API.replace(/\/$/, "")}/rastreo/${n}`).catch(() => null);
+    if (r && r.status === 404) delete guias[n];
+  }
+  guardar("cbx_guias", guias);
+  pintarResumen();
+});
+$("#form-seguir").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const n = $("#seguir-numero").value.trim().toUpperCase();
+  try {
+    recordarGuia(await api("GET", `/rastreo/${encodeURIComponent(n)}`));
+    $("#seguir-numero").value = "";
+    pintarResumen();
+  } catch { /* el toast ya explica */ }
+});
+
+/* ========================================================================
+   Registrar guía (US01)
+   ======================================================================== */
+$("#form-registrar").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const cuerpo = {
+    remitente: { nombre: f.rem_nombre, telefono: f.rem_tel },
+    destinatario: { nombre: f.des_nombre, telefono: f.des_tel },
+    origen: { calle: f.ori_calle, codigo_postal: f.ori_cp },
+    destino: { calle: f.des_calle, codigo_postal: f.des_cp },
+    paquete: { peso_kg: +f.peso, largo_cm: +f.largo, ancho_cm: +f.ancho, alto_cm: +f.alto },
+    nivel: f.nivel, valor_declarado: +f.valor, sucursal: f.sucursal,
+  };
+  try {
+    const g = await api("POST", "/guias", cuerpo);
+    recordarGuia({ ...g, telefono_remitente: f.rem_tel });
+    toast("Guía generada", `${g.numero} · tarifa ${dinero(g.tarifa)}`);
+    $("#registro-resultado").innerHTML = `
+      <table class="det">
+        <tr><th>Número de guía</th><td class="mono"><b>${esc(g.numero)}</b></td></tr>
+        <tr><th>Tarifa</th><td>${esc(dinero(g.tarifa))}</td></tr>
+        <tr><th>Fecha estimada</th><td>${fecha(g.fecha_estimada)}</td></tr>
+        <tr><th>Nivel</th><td>${esc(g.nivel)}</td></tr>
+        <tr><th>Estado</th><td>${badge(g.estado)}</td></tr>
+      </table>
+      <div class="msg-cliente">${esc(g.mensaje)}</div>
+      <p><a href="#" id="btn-ir-guia">Consultar esta guía</a></p>`;
+    $("#btn-ir-guia").onclick = (ev) => { ev.preventDefault(); abrirGuia(g.numero); };
+    pintarResumen();
+  } catch { /* el toast ya explica */ }
+});
+
+/* ========================================================================
+   Operar guía
+   ======================================================================== */
+async function abrirGuia(numero) {
+  irA("guia");
+  $("#buscar-numero").value = numero;
+  try {
+    const d = await api("GET", `/rastreo/${encodeURIComponent(numero)}`);
+    recordarGuia(d);
+    guiaActual = numero;
+    $("#historial").innerHTML = "";
+    if (guias[numero].telefono_remitente) $("#historial-tel").value = guias[numero].telefono_remitente;
+    pintarGuia();
+  } catch { $("#guia-contenido").style.display = "none"; }
+}
+
+function pintarGuia() {
+  const g = guias[guiaActual];
+  $("#guia-contenido").style.display = "block";
+  $("#g-numero").textContent = g.numero;
+  $("#g-badge").innerHTML = badge(g.estado);
+  $("#g-fecha").textContent = fecha(g.fecha_estimada);
+  $("#g-nivel").textContent = g.nivel ?? "—";
+  $("#g-tarifa").textContent = dinero(g.tarifa);
+  $("#g-intentos").textContent = g.intentos_fallidos ?? "—";
+  $("#g-destino").textContent = g.destino ?? "—";
+  $("#g-garantia").textContent = g.con_garantia === undefined ? "—" : (g.con_garantia ? "Sí" : "No");
+  $("#g-cargos").textContent = dinero(g.cargos_adicionales);
+  $("#g-reembolso").textContent = g.reembolso || g.compensacion ? `${dinero(g.reembolso)} / ${dinero(g.compensacion)}` : "—";
+  $("#g-mensaje").textContent = g.mensaje;
+
+  // Barra de progreso sobre la ruta normal
+  const enRuta = RUTA.indexOf(g.estado);
+  const avance = enRuta >= 0 ? enRuta : (g.estado === "EN_RESGUARDO" ? 4 : g.estado === "DEVUELTO" ? 4 : g.estado === "PERDIDO" ? 2 : 0);
+  $("#g-pasos").innerHTML = "Ruta: " + RUTA.map((e, i) =>
+    `<span class="paso ${i <= avance ? "hecho" : ""} ${e === g.estado ? "actual" : ""}">${NOMBRES[e]}</span>`).join('<span class="sep">›</span>');
+  $("#g-aviso").textContent = RUTA.includes(g.estado) ? "" : `Estado fuera de la ruta normal: ${NOMBRES[g.estado]}.`;
+
+  // Operaciones válidas para el estado (tabla de la State Machine)
+  const todas = $("#ver-todas").checked;
+  $$(".op").forEach((op) => op.classList.toggle("oculta", !todas && !op.dataset.estados.split(",").includes(g.estado)));
+  if (SIGUIENTE_ESCANEO[g.estado]) $("#op-escaneo [name=nuevo_estado]").value = SIGUIENTE_ESCANEO[g.estado];
+  const sinOps = $$(".op").every((op) => op.classList.contains("oculta"));
+  $("#g-aviso").textContent += sinOps ? " Estado final: no admite más operaciones." : "";
+}
+
+$("#ver-todas").addEventListener("change", () => guiaActual && pintarGuia());
+$("#form-buscar").addEventListener("submit", (e) => {
+  e.preventDefault();
+  abrirGuia($("#buscar-numero").value.trim().toUpperCase());
+});
+$("#btn-recargar").addEventListener("click", () => guiaActual && abrirGuia(guiaActual));
+
+/* Ejecuta una operación sobre la guía actual y refresca la vista con el GuiaOut que devuelve la API. */
+async function operar(metodo, ruta, cuerpo, exito) {
+  try {
+    const g = await api(metodo, `/guias/${encodeURIComponent(guiaActual)}${ruta}`, cuerpo);
+    recordarGuia(g);
+    pintarGuia();
+    pintarResumen();
+    toast(exito, g.mensaje);
+  } catch { /* el toast ya explica */ }
+}
+const datosDe = (form) => Object.fromEntries(new FormData(form));
+
+$("#op-escaneo").addEventListener("submit", (e) => {
+  e.preventDefault();
+  operar("POST", "/escaneos", datosDe(e.target), "Escaneo registrado");
+});
+$("#op-intento").addEventListener("submit", (e) => {
+  e.preventDefault();
+  operar("POST", "/intentos-fallidos", datosDe(e.target), "Intento fallido registrado");
+});
+$("#op-entrega").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const d = datosDe(e.target);
+  operar("POST", "/entrega", { ...d, es_tercero: !!d.es_tercero }, "Entrega registrada");
+});
+$("#op-reagendar").addEventListener("click", () => operar("POST", "/reagendamiento", null, "Visita reagendada"));
+$("#op-cancelar").addEventListener("click", () => operar("POST", "/cancelacion", null, "Guía cancelada"));
+$("#op-perdida").addEventListener("click", () => operar("POST", "/perdida", null, "Pérdida declarada"));
+$("#op-corregir").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const d = datosDe(e.target);
+  const cuerpo = {};
+  if (d.ori_calle || d.ori_cp) cuerpo.origen = { calle: d.ori_calle, codigo_postal: d.ori_cp };
+  if (d.des_calle || d.des_cp) cuerpo.destino = { calle: d.des_calle, codigo_postal: d.des_cp };
+  operar("PATCH", "/datos", cuerpo, "Datos corregidos");
+});
+$("#op-direccion").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const d = datosDe(e.target);
+  operar("PATCH", "/direccion", { nueva_direccion: { calle: d.calle, codigo_postal: d.cp },
+                                   identidad_validada: !!d.identidad }, "Dirección cambiada");
+});
+$("#op-dano").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    const inc = await api("POST", "/incidencias/danos", { numero_guia: guiaActual, foto: datosDe(e.target).foto });
+    toast("Folio abierto", `${inc.folio} · asignado a ${inc.asignada_a}`);
+  } catch { /* el toast ya explica */ }
+});
+
+$("#form-historial").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const tel = $("#historial-tel").value.trim();
+  try {
+    const h = await api("GET", `/rastreo/${encodeURIComponent(guiaActual)}/historial?telefono=${encodeURIComponent(tel)}`);
+    recordarGuia({ numero: h.numero, estado: h.estado, fecha_estimada: h.fecha_estimada, telefono_remitente: tel });
+    pintarGuia();
+    $("#historial").innerHTML = h.eventos.length ? `<table>
+      <thead><tr><th>Fecha y hora</th><th>Estado</th><th>Ubicación</th></tr></thead>
+      <tbody>${[...h.eventos].reverse().map((ev) => `
+        <tr><td>${fechaHora(ev.fecha_hora)}</td><td>${badge(ev.estado)}</td><td>${esc(ev.ubicacion)}</td></tr>`).join("")}</tbody></table>`
+      : `<p class="vacio">Sin eventos.</p>`;
+  } catch { $("#historial").innerHTML = ""; }
+});
+
+/* ========================================================================
+   Incidencias (US12, US13, US14)
+   ======================================================================== */
+async function cargarIncidencias() {
+  try { incidencias = await api("GET", "/incidencias"); } catch { incidencias = []; }
+  $("#tabla-incidencias").innerHTML = incidencias.length ? incidencias.map((i) => `
+    <tr>
+      <td class="mono">${esc(i.folio)}</td><td class="mono">${esc(i.numero_guia)}</td><td>${esc(i.tipo)}</td>
+      <td>${badge(i.estado)}</td><td>${esc(i.asignada_a)}</td>
+      <td><div class="acciones">
+        ${i.tipo === "DANO" ? `<button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="REEMBOLSO">Reembolso</button>
+          <button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="REPOSICION">Reposición</button>` : ""}
+        <button class="btn sec chico" data-folio="${esc(i.folio)}" data-res="ATENDIDA">Atendida</button>
+      </div></td>
+    </tr>`).join("")
+    : `<tr><td colspan="6" class="vacio">Sin incidencias pendientes. Ejecuta el monitoreo con una fecha simulada para generar alertas.</td></tr>`;
+  pintarResumen();
+}
+$("#btn-incidencias").addEventListener("click", cargarIncidencias);
+$("#tabla-incidencias").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-folio]");
+  if (!b) return;
+  try {
+    const r = await api("POST", `/incidencias/${encodeURIComponent(b.dataset.folio)}/resolucion`, { resolucion: b.dataset.res });
+    toast("Incidencia resuelta", `${r.folio} · ${r.resolucion}`);
+    cargarIncidencias();
+  } catch { /* el toast ya explica */ }
+});
+$("#form-dano").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const d = datosDe(e.target);
+  try {
+    const inc = await api("POST", "/incidencias/danos", { numero_guia: d.numero_guia.trim().toUpperCase(), foto: d.foto });
+    toast("Folio abierto", `${inc.folio} · asignado a ${inc.asignada_a}`);
+    e.target.reset();
+    cargarIncidencias();
+  } catch { /* el toast ya explica */ }
+});
+
+/* ========================================================================
+   Monitoreo (US10, US12, US13)
+   ======================================================================== */
+const aLocal = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+$$("#form-monitoreo [data-dias]").forEach((b) => b.addEventListener("click", () => {
+  const d = new Date();
+  d.setDate(d.getDate() + Number(b.dataset.dias));
+  $("#mon-fecha").value = aLocal(d);
+}));
+$("#form-monitoreo").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const valor = $("#mon-fecha").value;
+  const qs = valor ? `?ahora=${encodeURIComponent(new Date(valor).toISOString())}` : "";
+  try {
+    const r = await api("POST", `/monitoreo/ejecutar${qs}`);
+    const bloque = (titulo, lista, color) => `
+      <div style="margin-bottom:10px"><b>${titulo} (${lista.length})</b>
+        <div class="chips" style="margin-top:6px">${lista.length ? lista.map((x) => `<span class="chip mono">${esc(x)}</span>`).join("") : `<span class="nota">Ninguna</span>`}</div></div>`;
+    $("#monitoreo-resultado").innerHTML = `
+      <p class="nota" style="margin:0 0 12px">Ejecutado en: ${fechaHora(r.ejecutado_en)}</p>
+      ${bloque("Alertas generadas", r.alertas_generadas, "var(--warn)")}
+      ${bloque("Alertas escaladas", r.alertas_escaladas, "var(--bad)")}
+      ${bloque("Guías devueltas", r.guias_devueltas, "var(--gray)")}`;
+    toast("Monitoreo ejecutado", `${r.alertas_generadas.length} alertas, ${r.alertas_escaladas.length} escaladas, ${r.guias_devueltas.length} devueltas`);
+    actualizarResumen();
+  } catch { /* el toast ya explica */ }
+});
+
+/* ========================================================================
+   Inicio
+   ======================================================================== */
+verificarSalud();
+actualizarResumen();
+</script>
+</body>
+</html>
