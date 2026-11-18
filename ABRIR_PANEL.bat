@@ -8,15 +8,24 @@ set "PY=.venv\Scripts\python.exe"
 set "PANEL=http://localhost:8000/panel/"
 set "DATABASE_URL=sqlite:///./cargobox_demo.db"
 
+REM Si el entorno .venv quedo roto (por ejemplo, se desinstalo o actualizo Python), se borra y se crea de nuevo
+if exist "%PY%" (
+  "%PY%" -c "import sys" >nul 2>&1
+  if errorlevel 1 (
+    echo El entorno de Python anterior ya no funciona. Se va a crear de nuevo...
+    rmdir /s /q .venv
+  )
+)
+
 if exist "%PY%" (
   "%PY%" scripts\esperar_api.py --segundos 1
   if not errorlevel 1 goto abrir
 )
 
 if not exist "%PY%" (
-  echo Preparando CargoBox por primera vez, espera unos minutos...
-  py -3 -m venv .venv
-  if errorlevel 1 goto sin_python
+  echo Preparando CargoBox, espera unos minutos...
+  py -3 -m venv .venv >nul 2>&1 || python -m venv .venv
+  if not exist "%PY%" goto sin_python
 )
 
 REM Reinstala dependencias solo si requirements.txt cambio desde la ultima vez
