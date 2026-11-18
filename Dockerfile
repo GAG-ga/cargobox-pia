@@ -11,6 +11,7 @@ COPY src ./src
 COPY tests ./tests
 COPY docs ./docs
 COPY scripts ./scripts
+COPY frontend ./frontend
 
 EXPOSE 8000
 # Render (y otras plataformas) inyectan PORT; en local se usa 8000.
